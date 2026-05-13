@@ -29,9 +29,9 @@ SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
     "django-insecure-CAMBIA-ESTA-CLAVE-EN-PRODUCCION-1234567890",
 )
-DEBUG = env_bool("DJANGO_DEBUG", True)
+DEBUG = env_bool("DJANGO_DEBUG", False)
 ALLOWED_HOSTS = [h.strip() for h in os.environ.get(
-    "DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0,*"
+    "DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0,lliscano.pythonanywhere.com,*"
 ).split(",") if h.strip()]
 CSRF_TRUSTED_ORIGINS = [
     o.strip() for o in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
@@ -152,6 +152,10 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+
+STATIC_ROOT = '/home/lliscano/alambra-nails/staticfiles/'
+MEDIA_ROOT = '/home/lliscano/alambra-nails/media/'
 
 # WhiteNoise comprime y cachea estáticos en producción.
 STORAGES = {
