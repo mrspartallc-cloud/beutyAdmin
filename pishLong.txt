@@ -5,8 +5,6 @@ privacidad para tus clientas y
 flujo de caja claro,
 listo para operar en EE.UU.
 
-
-
 Clave:
 * Cero overbooking: El calendario detecta y bloquea solapamientos en tiempo real.
 * Privacidad nativa: Clientas solo ven nickname, nunca nombres reales ni datos sensibles.
