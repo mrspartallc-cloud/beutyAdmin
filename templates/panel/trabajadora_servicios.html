@@ -1,0 +1,160 @@
+{% extends 'panel/base_panel.html' %}
+{% block title %}Services for @{{ trabajadora.nickname }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">
+      <a href="{% url 'panel:trabajadora_update' trabajadora.pk %}"
+         style="color:inherit;text-decoration:none;">← @{{ trabajadora.nickname }}</a>
+    </h1>
+    <p class="page-subtitle">
+      Services this technician offers and the duration for each one.
+      <br>
+      <small style="color:var(--color-text-muted);">
+        💡 Duration here defines how much agenda time each appointment blocks.
+        e.g. if "Pedicure" takes 20 min, this technician can take 3 appointments per hour.
+      </small>
+    </p>
+  </div>
+</div>
+
+{% if messages %}
+  <div class="messages">
+    {% for m in messages %}
+      <div class="alert alert-{{ m.tags }}">{{ m }}</div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{# ── Form to add a new service ────────────────────── #}
+{% if servicios_disponibles %}
+  <div class="card" style="margin-bottom:24px;">
+    <div class="card-header">
+      <h2 style="margin:0;font-size:1.1rem;">+ Add service</h2>
+    </div>
+    <form method="post" action="{% url 'panel:trabajadora_servicio_add' trabajadora.pk %}"
+          class="form-inline" style="padding:18px;display:grid;grid-template-columns:2fr 1fr auto;gap:12px;align-items:end;">
+      {% csrf_token %}
+      <div class="form-field">
+        <label>Service</label>
+        <select name="servicio" required class="form-input">
+          <option value="">— Choose a service —</option>
+          {% for s in servicios_disponibles %}
+            <option value="{{ s.pk }}" data-default="{{ s.duracion_minutos }}">
+              {{ s.icono|default:"💅" }} {{ s.nombre }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Duration (min)</label>
+        <input type="number" name="duracion_minutos" id="newDuracion"
+               min="5" max="480" step="5" value="60"
+               required class="form-input">
+      </div>
+      <button type="submit" class="btn btn-primary">Add</button>
+    </form>
+  </div>
+{% else %}
+  <div class="card" style="margin-bottom:24px;padding:18px;text-align:center;color:var(--color-text-muted);">
+    <p>This technician already has all available services assigned.
+       If you want to add more, first
+       <a href="/admin/core/servicio/add/" target="_blank" style="color:var(--color-gold);">create new services</a>.</p>
+  </div>
+{% endif %}
+
+{# ── List of assigned services ───────────────────────────── #}
+{% if servicios_asignados %}
+  <div class="card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Duration</th>
+          <th>Appts / hour</th>
+          <th style="width:1%;">Status</th>
+          <th style="width:1%;text-align:right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ts in servicios_asignados %}
+          <tr {% if not ts.activo %}style="opacity:0.5;"{% endif %}>
+            <td>
+              <strong>{{ ts.servicio.icono|default:"💅" }} {{ ts.servicio.nombre }}</strong>
+              <br><small style="color:var(--color-text-muted);">${{ ts.servicio.precio|floatformat:0 }}</small>
+            </td>
+            <td>
+              <form method="post" action="{% url 'panel:trabajadora_servicio_edit' ts.pk %}"
+                    style="display:flex;gap:6px;align-items:center;">
+                {% csrf_token %}
+                <input type="number" name="duracion_minutos"
+                       value="{{ ts.duracion_minutos }}"
+                       min="5" max="480" step="5"
+                       class="form-input" style="width:80px;text-align:center;">
+                <span style="color:var(--color-text-muted);font-size:0.85rem;">min</span>
+                <button type="submit" class="btn btn-ghost btn-xs"
+                        title="Save new duration">💾</button>
+              </form>
+            </td>
+            <td>
+              {% with cap=60|add:0 %}
+                {% if ts.duracion_minutos <= 60 %}
+                  <strong style="color:var(--color-gold);">
+                    ≈ {% widthratio 60 ts.duracion_minutos 1 %} appt{{ cap|pluralize }}
+                  </strong>
+                {% else %}
+                  <small style="color:var(--color-text-muted);">every {{ ts.duracion_minutos }} min</small>
+                {% endif %}
+              {% endwith %}
+            </td>
+            <td>
+              <form method="post" action="{% url 'panel:trabajadora_servicio_toggle' ts.pk %}">
+                {% csrf_token %}
+                <button type="submit"
+                        class="badge {% if ts.activo %}badge-success{% else %}badge-warning{% endif %}"
+                        style="border:none;cursor:pointer;font-family:inherit;">
+                  {% if ts.activo %}✓ Active{% else %}⏸ Paused{% endif %}
+                </button>
+              </form>
+            </td>
+            <td style="text-align:right;">
+              <form method="post" action="{% url 'panel:trabajadora_servicio_delete' ts.pk %}"
+                    onsubmit="return confirm('Remove &quot;{{ ts.servicio.nombre }}&quot; from this technician? Existing appointments will not be deleted.');"
+                    style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-xs">Delete</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="card" style="padding:40px;text-align:center;">
+    <h3 style="margin:0 0 8px;">No services assigned</h3>
+    <p style="color:var(--color-text-muted);margin:0;">
+      This technician has no services yet. Add one using the form above.
+    </p>
+  </div>
+{% endif %}
+
+<div style="margin-top:24px;display:flex;gap:12px;">
+  <a href="{% url 'panel:trabajadora_update' trabajadora.pk %}" class="btn btn-ghost">
+    ← Back to technician
+  </a>
+  <a href="{% url 'panel:trabajadora_disponibilidad' trabajadora.pk %}" class="btn btn-ghost">
+    📅 Set up schedule
+  </a>
+</div>
+
+<script>
+  // Auto-fill duration with the service default when one is chosen
+  document.querySelector('select[name=servicio]')?.addEventListener('change', function(e) {
+    const opt = e.target.selectedOptions[0];
+    const def = opt?.dataset?.default;
+    if (def) document.getElementById('newDuracion').value = def;
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% block title %}@{{ worker.nickname }} · Book{% endblock %}
+
+{% block content %}
+<section class="section section-booking-flow">
+  <div class="container">
+    <div class="booking-stepper">
+      <div class="step is-done"><span>1</span> Choose technician</div>
+      <div class="step is-active"><span>2</span> Date and time</div>
+      <div class="step"><span>3</span> Your info</div>
+    </div>
+
+    <div class="worker-header">
+      <div class="worker-avatar worker-avatar-lg">
+        {% if worker.foto %}
+          <img src="{{ worker.foto.url }}" alt="@{{ worker.nickname }}">
+        {% else %}
+          <span>{{ worker.nickname|first|upper }}</span>
+        {% endif %}
+      </div>
+      <div>
+        <p class="eyebrow">Book with</p>
+        <h1 class="worker-title">@{{ worker.nickname }}</h1>
+        {% if worker.bio %}<p class="worker-bio-large">{{ worker.bio }}</p>{% endif %}
+      </div>
+      <a href="{% url 'bookings:select_worker' %}" class="btn btn-ghost btn-sm">← Change</a>
+    </div>
+
+    {# ── Selector de servicio (paso previo al calendario) ─────────── #}
+    {% if servicios_que_hace %}
+      <div class="card" style="margin-bottom:24px;padding:24px;">
+        <h2 style="margin-top:0;font-size:1.2rem;font-family:var(--font-display);">
+          Choose the service
+        </h2>
+        <p style="color:var(--color-text-muted);font-size:0.9rem;margin:6px 0 16px;">
+          Your appointment duration depends on the service. Tap one to see the open times.
+        </p>
+        <div class="services-chips" id="servicesChips">
+          {% for ts in servicios_que_hace %}
+            <button type="button" class="service-chip" data-id="{{ ts.servicio.pk }}"
+                    data-min="{{ ts.duracion_minutos }}">
+              <span class="chip-icon">{{ ts.servicio.icono|default:"💅" }}</span>
+              <span class="chip-name">{{ ts.servicio.nombre }}</span>
+              <span class="chip-meta">{{ ts.duracion_minutos }} min · ${{ ts.servicio.precio|floatformat:0 }}</span>
+            </button>
+          {% endfor %}
+        </div>
+      </div>
+    {% else %}
+      <div class="card" style="margin-bottom:24px;padding:24px;text-align:center;">
+        <p style="color:var(--color-text-muted);">
+          This technician doesn't have any services assigned yet. Please choose another
+          or come back later.
+        </p>
+        <a href="{% url 'bookings:select_worker' %}" class="btn btn-primary btn-sm" style="margin-top:12px;">
+          ← Back to catalog
+        </a>
+      </div>
+    {% endif %}
+
+    {% if servicios_que_hace %}
+    <div class="calendar-grid" id="calendarSection" style="opacity:0.4;pointer-events:none;transition:opacity 0.3s;">
+      {# ── Calendar ─────────────────────────────────────── #}
+      <div class="card calendar-card">
+        <div class="calendar-head">
+          <button type="button" class="cal-nav" id="calPrev" aria-label="Previous month">‹</button>
+          <h2 id="calMonthLabel">…</h2>
+          <button type="button" class="cal-nav" id="calNext" aria-label="Next month">›</button>
+        </div>
+        <div class="calendar-weekdays">
+          <span>M</span><span>T</span><span>W</span>
+          <span>T</span><span>F</span><span>S</span><span>S</span>
+        </div>
+        <div class="calendar-days" id="calDays"></div>
+        <p class="calendar-legend">
+          <span class="dot dot-available"></span> Available
+          <span class="dot dot-selected"></span> Selected
+        </p>
+      </div>
+
+      {# ── Slots del día ──────────────────────────────────── #}
+      <div class="card slots-card">
+        <h3 id="slotsTitle">Select a day</h3>
+        <p class="slots-hint" id="slotsHint">
+          First choose a service above, then a day.
+        </p>
+        <div class="slots-grid" id="slotsGrid"></div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+  .services-chips {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+  }
+  .service-chip {
+    display: flex; flex-direction: column; gap: 4px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: var(--color-cream);
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    color: var(--color-text);
+  }
+  .service-chip:hover {
+    border-color: var(--color-gold);
+    transform: translateY(-1px);
+  }
+  .service-chip.is-selected {
+    background: linear-gradient(135deg, var(--color-gold), var(--color-gold-dark));
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 6px 16px -6px rgba(168, 136, 75, 0.5);
+  }
+  .service-chip .chip-icon { font-size: 1.4rem; }
+  .service-chip .chip-name { font-weight: 600; font-size: 0.98rem; }
+  .service-chip .chip-meta {
+    font-size: 0.78rem;
+    opacity: 0.75;
+  }
+  .service-chip.is-selected .chip-meta { opacity: 0.9; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const NICKNAME = "{{ worker.nickname }}";
+  const DIAS_CON_HORARIO = {{ dias_con_horario|safe }};
+  const HOY_ISO = "{{ hoy|date:'Y-m-d' }}";
+  const VENTANA_DIAS = {{ ventana_dias }};
+  const SLOTS_URL = "{% url 'bookings:slots_disponibles' worker.nickname %}";
+  const CONFIRM_URL_TPL = "{% url 'bookings:confirmar' worker.nickname '__FECHA__' '__HORA__' %}";
+
+  // Service elegido (lo lee booking.js)
+  window.SERVICIO_ID = null;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const chips = document.querySelectorAll('#servicesChips .service-chip');
+    const calSec = document.getElementById('calendarSection');
+    const slotsHint = document.getElementById('slotsHint');
+
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('is-selected'));
+        chip.classList.add('is-selected');
+        window.SERVICIO_ID = chip.dataset.id;
+
+        // Habilitar calendario
+        if (calSec) {
+          calSec.style.opacity = '1';
+          calSec.style.pointerEvents = 'auto';
+        }
+        if (slotsHint) {
+          slotsHint.textContent = 'Tap an available day on the calendar to see the open times.';
+        }
+        // If a day is already selected, reload slots.
+        if (window.RECARGAR_SLOTS) window.RECARGAR_SLOTS();
+      });
+    });
+  });
+</script>
+<script src="{% load static %}{% static 'js/booking.js' %}"></script>
+{% endblock %}

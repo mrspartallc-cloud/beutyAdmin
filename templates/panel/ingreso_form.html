@@ -1,0 +1,145 @@
+{% extends 'panel/base_panel.html' %}
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow">Income</p>
+    <h1 class="page-title">{{ titulo }}</h1>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'panel:dashboard' %}" class="btn btn-ghost btn-sm">← Back</a>
+  </div>
+</div>
+
+<div class="ingreso-grid">
+  {# ── Formulario ─────────────────────────────────────────── #}
+  <div class="card card-narrow">
+    <form method="post" novalidate id="ingresoForm">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="form-alert">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="form-field">
+        <label for="{{ form.trabajadora.id_for_label }}">Technician *</label>
+        {{ form.trabajadora }}
+        {% if form.trabajadora.errors %}
+          <small class="form-error">{{ form.trabajadora.errors|join:" " }}</small>
+        {% endif %}
+      </div>
+
+      <div class="form-field">
+        <label for="{{ form.fecha.id_for_label }}">Date *</label>
+        {{ form.fecha }}
+        {% if form.fecha.errors %}
+          <small class="form-error">{{ form.fecha.errors|join:" " }}</small>
+        {% endif %}
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="{{ form.monto_original.id_for_label }}">Service amount ($) *</label>
+          {{ form.monto_original }}
+          <small class="form-hint">What the client paid.</small>
+          {% if form.monto_original.errors %}
+            <small class="form-error">{{ form.monto_original.errors|join:" " }}</small>
+          {% endif %}
+        </div>
+        <div class="form-field">
+          <label for="{{ form.propina.id_for_label }}">Tip ($)</label>
+          {{ form.propina }}
+          {% if form.propina.errors %}
+            <small class="form-error">{{ form.propina.errors|join:" " }}</small>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="{{ form.notas.id_for_label }}">Notes</label>
+        {{ form.notas }}
+        {% if form.notas.errors %}
+          <small class="form-error">{{ form.notas.errors|join:" " }}</small>
+        {% endif %}
+      </div>
+
+      <div class="form-actions">
+        <a href="{% url 'panel:dashboard' %}" class="btn btn-ghost btn-sm">Cancel</a>
+        <button type="submit" class="btn btn-primary btn-sm">
+          {% if modo == 'editar' %}Update{% else %}Save{% endif %}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  {# ── Live calculation preview ── #}
+  <aside class="card preview-card">
+    <h3>Calculation preview</h3>
+    <p class="preview-hint">Updates as you change values.</p>
+
+    <dl class="preview-list">
+      <div>
+        <dt>Salon commission</dt>
+        <dd id="prev-porcentaje">—</dd>
+      </div>
+      <div>
+        <dt>Salon retains</dt>
+        <dd id="prev-descuento">$0.00</dd>
+      </div>
+      <div>
+        <dt>Net amount (technician)</dt>
+        <dd id="prev-monto">$0.00</dd>
+      </div>
+      <div>
+        <dt>+ Tip</dt>
+        <dd id="prev-propina">$0.00</dd>
+      </div>
+      <div class="preview-total">
+        <dt>Total for the technician</dt>
+        <dd id="prev-total">$0.00</dd>
+      </div>
+    </dl>
+  </aside>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{# Diccionario id->porcentaje so that el JS pueda calcular en vivo #}
+<script>
+  window.PORCENTAJES = {
+    {% for t in form.fields.trabajadora.queryset %}
+      "{{ t.id }}": {{ t.porcentaje }}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  };
+</script>
+<script>
+  (function () {
+    var sel  = document.getElementById('id_trabajadora');
+    var mon  = document.getElementById('id_monto_original');
+    var prop = document.getElementById('id_propina');
+    var fmt = function (n) { return '$' + (Number(n) || 0).toFixed(2); };
+
+    function recalc() {
+      var pct = window.PORCENTAJES[sel && sel.value] || 0;
+      var monto = parseFloat(mon && mon.value) || 0;
+      var propina = parseFloat(prop && prop.value) || 0;
+      var descuento = monto * (pct / 100);
+      var neto = monto - descuento;
+      var total = neto + propina;
+
+      var $ = function (id) { return document.getElementById(id); };
+      $('prev-porcentaje').textContent = pct ? pct.toFixed(2) + ' %' : '—';
+      $('prev-descuento').textContent = fmt(descuento);
+      $('prev-monto').textContent = fmt(neto);
+      $('prev-propina').textContent = fmt(propina);
+      $('prev-total').textContent = fmt(total);
+    }
+    [sel, mon, prop].forEach(function (el) {
+      if (el) el.addEventListener('input', recalc);
+      if (el) el.addEventListener('change', recalc);
+    });
+    recalc();
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'panel/base_panel.html' %}
+{% block title %}Delete image{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Delete this image?</h1>
+  <p class="page-subtitle" style="color:#dc2626;">
+    This action cannot be undone. The image will be removed from the gallery and the server.
+  </p>
+</div>
+
+<div class="card" style="padding:24px;max-width:540px;text-align:center;">
+  <img src="{{ obj.imagen.url }}" alt="{{ obj.descripcion|default:obj.titulo }}"
+       style="max-width:280px;max-height:280px;border-radius:12px;margin:0 auto 18px;display:block;box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+
+  <div style="margin-bottom:18px;">
+    <h3 style="margin:0 0 4px;">{{ obj.titulo|default:"(untitled)" }}</h3>
+    {% if obj.descripcion %}
+      <p style="color:var(--color-text-muted);margin:0;">{{ obj.descripcion }}</p>
+    {% endif %}
+  </div>
+
+  <form method="post" style="display:flex;gap:12px;justify-content:center;">
+    {% csrf_token %}
+    <a href="{% url 'panel:galeria_list' %}" class="btn btn-ghost">Cancel</a>
+    <button type="submit" class="btn btn-danger">
+      Yes, delete definitivamente
+    </button>
+  </form>
+</div>
+{% endblock %}

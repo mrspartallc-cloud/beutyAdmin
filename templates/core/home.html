@@ -1,0 +1,1810 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ site.name }} · Premium Nail Studio{% endblock %}
+
+{% block extra_css %}
+
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE MOBILE - Todo el home optimizado para teléfono
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Tablet (1024px) ────────────────────────────────────────────────────── */
+      @media (max-width: 1024px) {
+        .hero-section {
+          padding: 80px 0 60px;
+        }
+        
+        .about-grid {
+          grid-template-columns: 1fr;
+          gap: 40px;
+        }
+        
+        .services-grid {
+          grid-template-columns: repeat(2, 1fr) !important;
+          gap: 20px;
+        }
+      }
+
+      /* ─── Tablet pequeña / Móvil grande (768px) ──────────────────────────────── */
+      @media (max-width: 768px) {
+        /* HERO */
+        .hero,
+        .hero-section {
+          min-height: auto !important;
+          padding: 60px 0 40px !important;
+        }
+        
+        .hero-inner,
+        .container {
+          padding: 0 20px !important;
+        }
+        
+        .hero-eyebrow {
+          font-size: 0.65rem;
+          letter-spacing: 2px;
+          padding: 7px 16px;
+          margin-bottom: 18px;
+        }
+        
+        .hero-title {
+          font-size: clamp(2rem, 9vw, 3rem) !important;
+          line-height: 1.15 !important;
+          margin-bottom: 18px !important;
+        }
+        
+        .hero-subtitle {
+          font-size: 1.1rem !important;
+          margin-bottom: 16px !important;
+          padding: 0 12px;
+        }
+        
+        .hero-subtitle::before,
+        .hero-subtitle::after {
+          display: none !important;
+        }
+        
+        .hero-description {
+          font-size: 0.95rem !important;
+          line-height: 1.6 !important;
+          margin-bottom: 32px !important;
+          padding: 0 8px;
+        }
+        
+        /* CTA Buttons en móvil */
+        .hero-cta {
+          flex-direction: column !important;
+          gap: 12px !important;
+          margin-bottom: 50px !important;
+          padding: 0 16px;
+        }
+        
+        .hero-cta .btn,
+        .btn-lg {
+          width: 100% !important;
+          max-width: 320px !important;
+          margin: 0 auto;
+          justify-content: center !important;
+          padding: 16px 28px !important;
+          font-size: 0.95rem !important;
+        }
+        
+        .hero-divider {
+          margin-bottom: 40px !important;
+        }
+        
+        /* Stats en móvil */
+        .hero-stats {
+          grid-template-columns: 1fr !important;
+          gap: 14px !important;
+          max-width: 320px !important;
+          margin: 0 auto;
+        }
+        
+        .hero-stat {
+          padding: 18px !important;
+        }
+        
+        .hero-stat-num {
+          font-size: 1.8rem !important;
+        }
+        
+        .hero-stat-label {
+          font-size: 0.75rem !important;
+          letter-spacing: 1.2px !important;
+        }
+        
+        /* Decorative blobs ocultos en móvil */
+        .hero-deco-1,
+        .hero-deco-2,
+        .hero-bg-blob,
+        .hero-bg-blob-1,
+        .hero-bg-blob-2 {
+          display: none !important;
+        }
+        
+        .scroll-hint {
+          display: none !important;
+        }
+        
+        /* ── SERVICES ── */
+        .section,
+        .section-services {
+          padding: 50px 0 !important;
+        }
+        
+        .section-title {
+          font-size: 1.8rem !important;
+          margin-bottom: 24px !important;
+        }
+        
+        .section-eyebrow {
+          font-size: 0.7rem !important;
+          letter-spacing: 2px !important;
+        }
+        
+        .services-grid {
+          grid-template-columns: 1fr !important;
+          gap: 16px !important;
+          padding: 0 4px;
+        }
+        
+        .service-card {
+          padding: 20px !important;
+        }
+        
+        .service-name {
+          font-size: 1.1rem !important;
+        }
+        
+        .service-desc {
+          font-size: 0.9rem !important;
+        }
+        
+        .service-meta {
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+        
+        .service-price {
+          font-size: 1.2rem !important;
+        }
+        
+        /* ── GALLERY ── */
+        .section-gallery {
+          padding: 50px 0 !important;
+        }
+        
+        .gallery-header {
+          margin-bottom: 36px !important;
+        }
+        
+        .gallery-title {
+          font-size: 1.7rem !important;
+        }
+        
+        .gallery-lead {
+          font-size: 0.95rem !important;
+          padding: 0 16px;
+        }
+        
+        .gallery-wrapper {
+          max-height: 600px !important;
+        }
+        
+        .gallery-grid {
+          grid-template-columns: 1fr !important;
+          gap: 14px !important;
+        }
+        
+        .gallery-item,
+        .gallery-item--featured {
+          height: 260px !important;
+          grid-column: span 1 !important;
+          grid-row: span 1 !important;
+        }
+        
+        .gallery-badge {
+          font-size: 0.6rem !important;
+          padding: 4px 10px !important;
+          top: 12px !important;
+          right: 12px !important;
+        }
+        
+        .gallery-caption {
+          transform: translateY(0) !important;
+          padding: 16px !important;
+          font-size: 0.9rem !important;
+          background: linear-gradient(transparent, rgba(45,36,36,0.85));
+        }
+        
+        /* Lightbox móvil */
+        .lightbox-close {
+          top: 10px !important;
+          right: 10px !important;
+          width: 36px !important;
+          height: 36px !important;
+        }
+        
+        .lightbox-caption {
+          bottom: -40px !important;
+          font-size: 0.85rem !important;
+          padding: 0 16px;
+        }
+        
+        /* ── ABOUT ── */
+        .section-about {
+          padding: 50px 0 !important;
+        }
+        
+        .about-grid {
+          grid-template-columns: 1fr !important;
+          gap: 32px !important;
+        }
+        
+        .section-title-left {
+          font-size: 1.6rem !important;
+          text-align: center !important;
+        }
+        
+        .about-content .section-eyebrow {
+          display: block;
+          text-align: center;
+        }
+        
+        .about-lead {
+          font-size: 0.95rem !important;
+          text-align: center;
+        }
+        
+        .about-features {
+          padding-left: 0 !important;
+        }
+        
+        .about-features li {
+          gap: 14px !important;
+        }
+        
+        .about-feature-icon {
+          width: 44px !important;
+          height: 44px !important;
+          font-size: 1.2rem !important;
+          flex-shrink: 0;
+        }
+        
+        .about-features h4 {
+          font-size: 1rem !important;
+          margin-bottom: 4px !important;
+        }
+        
+        .about-features p {
+          font-size: 0.85rem !important;
+        }
+        
+        .about-visual-frame {
+          max-width: 280px;
+          margin: 0 auto;
+        }
+        
+        .about-visual-image {
+          width: 100% !important;
+          height: auto !important;
+        }
+        
+        /* ── CTA STRIP ── */
+        .section-cta-strip {
+          padding: 40px 0 !important;
+        }
+        
+        .cta-strip-inner {
+          flex-direction: column !important;
+          gap: 20px !important;
+          text-align: center !important;
+          padding: 0 20px !important;
+        }
+        
+        .cta-strip-inner h3 {
+          font-size: 1.4rem !important;
+          margin-bottom: 6px !important;
+        }
+        
+        .cta-strip-inner p {
+          font-size: 0.95rem !important;
+        }
+        
+        .cta-strip-inner .btn {
+          width: 100% !important;
+          max-width: 320px !important;
+          justify-content: center !important;
+        }
+      }
+
+      /* ─── Móvil pequeño (480px) ──────────────────────────────────────────────── */
+      @media (max-width: 480px) {
+        .hero-title {
+          font-size: 2rem !important;
+        }
+        
+        .hero-subtitle {
+          font-size: 1rem !important;
+        }
+        
+        .hero-description {
+          font-size: 0.9rem !important;
+        }
+        
+        .gallery-title {
+          font-size: 1.5rem !important;
+        }
+        
+        .section-title,
+        .section-title-left {
+          font-size: 1.5rem !important;
+        }
+        
+        .gallery-item,
+        .gallery-item--featured {
+          height: 240px !important;
+        }
+        
+        .hero-stat-num {
+          font-size: 1.6rem !important;
+        }
+      }
+
+      /* ─── Móvil muy pequeño (360px) ──────────────────────────────────────────── */
+      @media (max-width: 360px) {
+        .hero-inner,
+        .container {
+          padding: 0 14px !important;
+        }
+        
+        .hero-title {
+          font-size: 1.8rem !important;
+        }
+        
+        .hero-stats {
+          max-width: 100% !important;
+        }
+      }
+      </style>
+      {% endblock %}
+
+      {% block content %}
+
+      {# ─── HERO ─────────────────────────────────────────────────────── #}
+      <section class="hero" id="hero">
+        <div class="hero-bg-blob hero-bg-blob-1"></div>
+        <div class="hero-bg-blob hero-bg-blob-2"></div>
+
+
+
+        
+      <style>
+      /* ─── HERO SECTION PREMIUM ──────────────────────────────────────────────── */
+      .hero-section {
+        position: relative;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: 
+          radial-gradient(ellipse at top, rgba(201, 169, 110, 0.15), transparent 50%),
+          radial-gradient(ellipse at bottom, rgba(168, 136, 75, 0.1), transparent 50%),
+          linear-gradient(180deg, #FFFAF7 0%, #FFF7EE 100%);
+        overflow: hidden;
+        padding: 100px 0 80px;
+      }
+
+      /* Animated background particles */
+      .hero-section::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: 
+          radial-gradient(circle at 20% 30%, rgba(201, 169, 110, 0.08) 0%, transparent 50%),
+          radial-gradient(circle at 80% 70%, rgba(168, 136, 75, 0.06) 0%, transparent 50%);
+        animation: floatBackground 20s ease-in-out infinite;
+      }
+
+      @keyframes floatBackground {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(-20px, -20px) scale(1.05); }
+      }
+
+      /* Decorative elements */
+      .hero-deco {
+        position: absolute;
+        pointer-events: none;
+      }
+
+      .hero-deco-1 {
+        top: 10%;
+        right: 10%;
+        width: 200px;
+        height: 200px;
+        background: radial-gradient(circle, rgba(201, 169, 110, 0.15), transparent 70%);
+        border-radius: 50%;
+        filter: blur(40px);
+        animation: float 8s ease-in-out infinite;
+      }
+
+      .hero-deco-2 {
+        bottom: 15%;
+        left: 5%;
+        width: 250px;
+        height: 250px;
+        background: radial-gradient(circle, rgba(168, 136, 75, 0.12), transparent 70%);
+        border-radius: 50%;
+        filter: blur(50px);
+        animation: float 10s ease-in-out infinite reverse;
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0) translateX(0); }
+        50% { transform: translateY(-30px) translateX(20px); }
+      }
+
+      .hero-inner {
+        position: relative;
+        z-index: 1;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px;
+        text-align: center;
+      }
+
+      /* ── Eyebrow ────────────────────────────────────────────────────────────── */
+      .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: #C9A96E;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        padding: 10px 24px;
+        border-radius: 100px;
+        margin-bottom: 24px;
+        border: 1px solid rgba(201, 169, 110, 0.2);
+        box-shadow: 
+          0 4px 16px rgba(201, 169, 110, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        animation: fadeInDown 0.8s ease backwards;
+      }
+
+      .hero-eyebrow::before {
+        content: '✨';
+        font-size: 1rem;
+        animation: sparkle 2s ease-in-out infinite;
+      }
+
+      @keyframes sparkle {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.2); }
+      }
+
+      /* ── Title ──────────────────────────────────────────────────────────────── */
+      .hero-title {
+        font-size: clamp(2.5rem, 8vw, 5rem);
+        font-weight: 700;
+        line-height: 1.1;
+        margin-bottom: 24px;
+        background: linear-gradient(
+          135deg,
+          #2D2424 0%,
+          #6B5B53 30%,
+          #C9A96E 60%,
+          #A8884B 100%
+        );
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: 
+          fadeInUp 0.8s ease 0.2s backwards,
+          shimmerText 8s ease-in-out infinite;
+      }
+
+      @keyframes shimmerText {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+      }
+
+      /* ── Subtitle ───────────────────────────────────────────────────────────── */
+      .hero-subtitle {
+        font-size: clamp(1.2rem, 3vw, 1.8rem);
+        font-weight: 500;
+        color: #6B5B53;
+        margin-bottom: 20px;
+        font-style: italic;
+        position: relative;
+        display: inline-block;
+        animation: fadeInUp 0.8s ease 0.4s backwards;
+      }
+
+      .hero-subtitle::before,
+      .hero-subtitle::after {
+        content: '"';
+        font-size: 2.5rem;
+        color: rgba(201, 169, 110, 0.3);
+        position: absolute;
+        font-family: Georgia, serif;
+      }
+
+      .hero-subtitle::before {
+        left: -30px;
+        top: -10px;
+      }
+
+      .hero-subtitle::after {
+        right: -30px;
+        bottom: -20px;
+      }
+
+      /* ── Description ────────────────────────────────────────────────────────── */
+      .hero-description {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #6B5B53;
+        max-width: 650px;
+        margin: 0 auto 48px;
+        animation: fadeInUp 0.8s ease 0.6s backwards;
+      }
+
+      /* ── CTA Buttons ────────────────────────────────────────────────────────── */
+      .hero-cta {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 80px;
+        animation: fadeInUp 0.8s ease 0.8s backwards;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 18px 40px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        border-radius: 100px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        border: 2px solid transparent;
+        cursor: pointer;
+      }
+
+      .btn::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      .btn:hover::before {
+        opacity: 1;
+      }
+
+      /* Primary Button */
+      .btn-primary {
+        background: linear-gradient(135deg, #C9A96E, #A8884B);
+        color: #fff;
+        box-shadow: 
+          0 8px 24px rgba(168, 136, 75, 0.3),
+          0 2px 8px rgba(168, 136, 75, 0.2);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 
+          0 12px 32px rgba(168, 136, 75, 0.4),
+          0 4px 12px rgba(168, 136, 75, 0.3);
+      }
+
+      .btn-primary:active {
+        transform: translateY(0);
+      }
+
+      .btn-primary::after {
+        content: '→';
+        margin-left: 4px;
+        transition: transform 0.3s;
+      }
+
+      .btn-primary:hover::after {
+        transform: translateX(4px);
+      }
+
+      /* Outline Button */
+      .btn-outline {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        color: #6B5B53;
+        border-color: rgba(201, 169, 110, 0.3);
+        box-shadow: 
+          0 4px 16px rgba(201, 169, 110, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      }
+
+      .btn-outline:hover {
+        background: #fff;
+        border-color: #C9A96E;
+        color: #C9A96E;
+        transform: translateY(-2px);
+        box-shadow: 
+          0 8px 24px rgba(201, 169, 110, 0.2),
+          inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      }
+
+      /* ── Divider ────────────────────────────────────────────────────────────── */
+      .hero-divider {
+        width: 40px;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #C9A96E, transparent);
+        margin: 0 auto 60px;
+        border-radius: 100px;
+        animation: fadeIn 0.8s ease 1s backwards;
+      }
+
+      /* ── Stats ──────────────────────────────────────────────────────────────── */
+      .hero-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 40px;
+        max-width: 800px;
+        margin: 0 auto;
+        animation: fadeInUp 0.8s ease 1.2s backwards;
+      }
+
+      .hero-stat {
+        position: relative;
+        padding: 24px;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        border: 1px solid rgba(201, 169, 110, 0.15);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 
+          0 4px 16px rgba(45, 36, 36, 0.04),
+          inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      }
+
+      .hero-stat:hover {
+        transform: translateY(-4px);
+        background: rgba(255, 255, 255, 0.9);
+        border-color: rgba(201, 169, 110, 0.3);
+        box-shadow: 
+          0 12px 32px rgba(201, 169, 110, 0.15),
+          inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      }
+
+      /* Accent bar on top */
+      .hero-stat::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 3px;
+        background: linear-gradient(90deg, #C9A96E, #A8884B);
+        border-radius: 0 0 100px 100px;
+        opacity: 0;
+        transition: opacity 0.3s, width 0.3s;
+      }
+
+      .hero-stat:hover::before {
+        opacity: 1;
+        width: 60px;
+      }
+
+      .hero-stat-num {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #2D2424, #C9A96E);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 8px;
+        line-height: 1;
+      }
+
+      .hero-stat-label {
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #6B5B53;
+      }
+
+      /* ── Trust Badges (Optional) ────────────────────────────────────────────── */
+      .hero-badges {
+        display: flex;
+        gap: 24px;
+        justify-content: center;
+        align-items: center;
+        margin-top: 60px;
+        opacity: 0.6;
+        animation: fadeIn 0.8s ease 1.4s backwards;
+      }
+
+      .hero-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+        color: #6B5B53;
+        font-weight: 500;
+      }
+
+      .hero-badge-icon {
+        width: 20px;
+        height: 20px;
+        color: #C9A96E;
+      }
+
+      /* ─── ANIMATIONS ────────────────────────────────────────────────────────── */
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      /* ─── SCROLL INDICATOR ──────────────────────────────────────────────────── */
+      .scroll-hint {
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        opacity: 0.4;
+        animation: fadeIn 0.8s ease 2s backwards;
+      }
+
+      .scroll-hint-icon {
+        width: 28px;
+        height: 44px;
+        border: 2px solid #C9A96E;
+        border-radius: 20px;
+        position: relative;
+      }
+
+      .scroll-hint-icon::before {
+        content: '';
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 4px;
+        height: 8px;
+        background: #C9A96E;
+        border-radius: 4px;
+        animation: scrollDot 2s ease-in-out infinite;
+      }
+
+      @keyframes scrollDot {
+        0%, 100% {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+        50% {
+          opacity: 0.5;
+          transform: translateX(-50%) translateY(12px);
+        }
+      }
+
+      .scroll-hint-text {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #6B5B53;
+        font-weight: 600;
+      }
+</style>
+
+
+
+
+
+
+<div class="container hero-inner">
+    <p class="hero-eyebrow">Premium Nail Studio</p>
+    <h1 class="hero-title">{{ site.name }}</h1>
+    <p class="hero-subtitle">
+      Designs that captivate, hands that tell stories.
+    </p>
+    <p class="hero-description">
+      Unique designs, professional techniques and a thoughtful space
+      so you can enjoy a moment of true wellness.
+    </p>
+
+    <div class="hero-cta">
+      <a href="{% url 'bookings:select_worker' %}" class="btn btn-primary btn-lg">
+        Book an Appointment
+      </a>
+      <a href="#gallery" class="btn btn-outline btn-lg">View Gallery</a>
+    </div>
+
+    <div class="hero-divider"></div>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-num">+5 yrs</div>
+        <div class="hero-stat-label">of experience</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">+1,200</div>
+        <div class="hero-stat-label">happy clients</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">100%</div>
+        <div class="hero-stat-label">premium products</div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+</section>
+
+{# ─── SERVICES ───────────────────────────────────────────────── #}
+<section class="section section-services" id="services">
+  <div class="container">
+    <p class="section-eyebrow">Services</p>
+    <h2 class="section-title">Exclusive Services</h2>
+
+    {% if servicios %}
+      <div class="services-grid">
+        {% for s in servicios %}
+          <article class="service-card {% if s.destacado %}is-featured{% endif %}">
+            <div class="service-card-head">
+              <span class="service-icon">{{ s.icono|default:"💅" }}</span>
+              {% if s.destacado %}
+                <span class="service-badge">Featured</span>
+              {% endif %}
+            </div>
+            <h3 class="service-name">{{ s.nombre }}</h3>
+            {% if s.descripcion %}
+              <p class="service-desc">{{ s.descripcion|truncatewords:18 }}</p>
+            {% endif %}
+            <div class="service-meta">
+              <span class="service-duration">⏱ {{ s.duracion_real_min }} min</span>
+              <span class="service-price">${{ s.precio|floatformat:0 }}</span>
+            </div>
+            <a href="{% url 'bookings:select_worker' %}" class="service-link">
+              Book this service →
+            </a>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="text-align:center;color:var(--color-text-muted);padding:40px 0;">
+        Services coming soon.
+      </p>
+    {% endif %}
+  </div>
+</section>
+
+
+<style>
+/* ─── GALLERY SECTION ──────────────────────────────────────────────────── */
+.section-gallery {
+  padding: 80px 0;
+  background: linear-gradient(180deg, #FFFAF7 0%, #FFF7EE 100%);
+  overflow: hidden;
+}
+
+.section-gallery .container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header */
+.gallery-header {
+  text-align: center;
+  margin-bottom: 60px;
+  animation: fadeInUp 0.8s ease;
+}
+
+.gallery-eyebrow {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #C9A96E;
+  background: rgba(201, 169, 110, 0.1);
+  padding: 8px 20px;
+  border-radius: 100px;
+  margin-bottom: 16px;
+}
+
+.gallery-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2D2424;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, #2D2424, #6B5B53);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gallery-lead {
+  font-size: 1.1rem;
+  color: #6B5B53;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ── SCROLL CONTAINER - MAX 2 ROWS VISIBLE ─────────────────────────────── */
+.gallery-wrapper {
+  position: relative;
+  max-height: 700px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 40px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 169, 110, 0.3) transparent;
+}
+
+.gallery-wrapper::-webkit-scrollbar {
+  width: 8px;
+}
+
+.gallery-wrapper::-webkit-scrollbar-track {
+  background: rgba(201, 169, 110, 0.05);
+  border-radius: 10px;
+}
+
+.gallery-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(201, 169, 110, 0.3);
+  border-radius: 10px;
+  transition: background 0.3s;
+}
+
+.gallery-wrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(201, 169, 110, 0.5);
+}
+
+.gallery-wrapper {
+  scroll-behavior: smooth;
+}
+
+.gallery-wrapper::after {
+  content: '';
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(255, 247, 238, 0.9) 50%,
+    rgba(255, 247, 238, 1) 100%
+  );
+  pointer-events: none;
+  z-index: 10;
+  display: block;
+}
+
+.gallery-wrapper.scrolled-to-bottom::after {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.scroll-indicator.hidden {
+  opacity: 0;
+}
+
+.scroll-indicator-icon {
+  width: 32px;
+  height: 32px;
+  background: rgba(201, 169, 110, 0.2);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #C9A96E;
+  animation: bounceDown 2s infinite;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(201, 169, 110, 0.3);
+}
+
+.scroll-indicator-text {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #C9A96E;
+  background: rgba(255, 250, 247, 0.9);
+  padding: 4px 12px;
+  border-radius: 100px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(201, 169, 110, 0.2);
+}
+
+@keyframes bounceDown {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(8px); }
+  60% { transform: translateY(4px); }
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  grid-auto-flow: dense;
+}
+
+@media (min-width: 768px) {
+  .gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .gallery-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.gallery-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 4px 20px rgba(45, 36, 36, 0.08);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  animation: fadeInScale 0.6s ease backwards;
+}
+
+.gallery-item:nth-child(1) { animation-delay: 0.1s; }
+.gallery-item:nth-child(2) { animation-delay: 0.2s; }
+.gallery-item:nth-child(3) { animation-delay: 0.3s; }
+.gallery-item:nth-child(4) { animation-delay: 0.4s; }
+.gallery-item:nth-child(5) { animation-delay: 0.5s; }
+.gallery-item:nth-child(6) { animation-delay: 0.6s; }
+.gallery-item:nth-child(7) { animation-delay: 0.7s; }
+.gallery-item:nth-child(8) { animation-delay: 0.8s; }
+
+.gallery-item--featured {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.gallery-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 40px rgba(201, 169, 110, 0.25);
+}
+
+.gallery-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 50%,
+    rgba(45, 36, 36, 0.8) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 1;
+}
+
+.gallery-item:hover::before {
+  opacity: 1;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gallery-item {
+  height: 320px;
+}
+
+.gallery-item--featured {
+  height: 660px;
+}
+
+.gallery-item:hover img {
+  transform: scale(1.08);
+}
+
+.gallery-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.gallery-item:hover .gallery-caption {
+  transform: translateY(0);
+}
+
+.gallery-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transform: translateX(-100%);
+  animation: shimmer 2s infinite;
+  pointer-events: none;
+}
+
+.gallery-item:hover::after {
+  animation: none;
+}
+
+.gallery-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: linear-gradient(135deg, #C9A96E, #A8884B);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 100px;
+  z-index: 2;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  animation: pulse 2s infinite;
+}
+
+.gallery-count {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 0.9rem;
+  color: #6B5B53;
+  font-weight: 500;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* ─── LIGHTBOX MODAL ────────────────────────────────────────────────────── */
+.gallery-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+.gallery-lightbox.is-active {
+  display: flex;
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  animation: zoomIn 0.3s ease;
+}
+
+.lightbox-img {
+  max-width: 100%;
+  max-height: 90vh;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: -50px;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
+}
+
+.lightbox-caption {
+  position: absolute;
+  bottom: -60px;
+  left: 0;
+  right: 0;
+  color: #fff;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+</style>
+
+
+
+
+{% if galeria %}
+<section class="section-gallery" id="gallery">
+  <div class="container">
+    <div class="gallery-header">
+      <span class="gallery-eyebrow">✨ Gallery</span>
+      <h2 class="gallery-title">Our Latest Work</h2>
+      <p class="gallery-lead">Get inspired by our stunning nail designs and transformations</p>
+   <div class="instagram-feed">
+ <br>
+
+
+ 
+
+{% comment %}
+    <div class="instagram-grid">
+      <!-- Imágenes cargadas vía API o estáticas -->
+      {% for post in instagram_posts %}
+      <a href="{{ post.url }}" target="_blank" class="instagram-item">
+        <img src="{{ post.thumbnail }}" alt="{{ post.caption }}" loading="lazy">
+        <div class="instagram-overlay">
+          <span>❤️ {{ post.likes }}</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    
+    <a href="https://instagram.com/{{ instagram_handle }}" 
+       class="btn btn-outline" 
+       target="_blank">
+      View Full Gallery  <p class="section-eyebrow">@{{ instagram_handle }}</p>→
+    </a>
+  </div>
+{% endcomment %}
+  
+   
+   
+    </div>
+
+    <div class="gallery-wrapper" id="galleryWrapper">
+      <div class="gallery-grid">
+        {% for img in galeria %}
+          <figure class="gallery-item {% if img.destacada %}gallery-item--featured{% endif %}" 
+                  data-src="{{ img.imagen.url }}"
+                  data-caption="{{ img.titulo|default:'' }}">
+            {% if img.destacada %}
+              <span class="gallery-badge">Featured</span>
+            {% endif %}
+            <img src="{{ img.imagen.url }}" 
+                 alt="{{ img.descripcion|default:img.titulo }}"
+                 loading="lazy" 
+                 decoding="async">
+            {% if img.titulo %}
+              <figcaption class="gallery-caption">{{ img.titulo }}</figcaption>
+            {% endif %}
+          </figure>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if galeria|length > 8 %}
+    <div class="gallery-count gallery-eyebrow ">
+      Showing <strong>{{ galeria|length }}</strong> designs
+    </div>
+    {% endif %}
+  </div>
+
+
+<!-- Usar widget de Elfsight o EmbedSocial (gratis hasta cierto límite) -->
+
+
+
+
+
+</section>
+
+
+
+
+<div class="gallery-lightbox" id="galleryLightbox">
+  <div class="lightbox-content">
+    <button class="lightbox-close" onclick="closeLightbox()">×</button>
+    <img class="lightbox-img" id="lightboxImg" src="" alt="">
+    <div class="lightbox-caption" id="lightboxCaption"></div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const wrapper = document.getElementById('galleryWrapper');
+  const indicator = document.getElementById('scrollIndicator');
+  const lightbox = document.getElementById('galleryLightbox');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxCaption = document.getElementById('lightboxCaption');
+  const galleryItems = document.querySelectorAll('.gallery-item');
+
+  if (wrapper && indicator) {
+    function checkScroll() {
+      const scrollTop = wrapper.scrollTop;
+      const scrollHeight = wrapper.scrollHeight;
+      const clientHeight = wrapper.clientHeight;
+      
+      if (scrollTop > 50 || scrollHeight <= clientHeight) {
+        indicator.classList.add('hidden');
+      } else {
+        indicator.classList.remove('hidden');
+      }
+
+      if (scrollTop + clientHeight >= scrollHeight - 10) {
+        wrapper.classList.add('scrolled-to-bottom');
+      } else {
+        wrapper.classList.remove('scrolled-to-bottom');
+      }
+    }
+
+    wrapper.addEventListener('scroll', checkScroll);
+    window.addEventListener('load', checkScroll);
+    window.addEventListener('resize', checkScroll);
+    setTimeout(checkScroll, 100);
+  }
+
+  galleryItems.forEach(item => {
+    item.addEventListener('click', function() {
+      const imgSrc = this.dataset.src || this.querySelector('img').src;
+      const caption = this.dataset.caption || '';
+      
+      lightboxImg.src = imgSrc;
+      lightboxCaption.textContent = caption;
+      lightbox.classList.add('is-active');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  window.closeLightbox = function() {
+    lightbox.classList.remove('is-active');
+    document.body.style.overflow = '';
+  };
+
+  lightbox.addEventListener('click', function(e) {
+    if (e.target === lightbox) {
+      closeLightbox();
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && lightbox.classList.contains('is-active')) {
+      closeLightbox();
+    }
+  });
+
+  if ('IntersectionObserver' in window) {
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const img = entry.target;
+          img.classList.add('loaded');
+          observer.unobserve(img);
+        }
+      });
+    });
+
+    const images = document.querySelectorAll('.gallery-item img');
+    images.forEach(img => imageObserver.observe(img));
+  }
+})();
+</script>
+{% endif %}
+
+
+{# ─── ABOUT ────────────────────────────────────────────────── #}
+<section class="section section-about" id="about">
+  <div class="container about-grid">
+    <div class="about-content">
+      <p class="section-eyebrow ">About Us</p>
+      <h2 class="section-title section-title-left">More than a salon. A ritual.</h2>
+      <p class="about-lead">
+        At {{ site.name }} every client deserves a moment of pause and self-care. We've created a warm, elegant environment where you can disconnect from the world while we turn your nails into works of art.
+      </p>
+
+      <ul class="about-features">
+        <li>
+          <div class="about-feature-icon"><span>✨</span></div>
+          <div>
+            <h4>Premium Quality</h4>
+            <p>We only work with recognized professional brands.</p>
+          </div>
+        </li>
+        <li>
+          <div class="about-feature-icon"><span>💗</span></div>
+          <div>
+            <h4>Impeccable Hygiene</h4>
+            <p>Hospital-grade sterilization on every tool.</p>
+          </div>
+        </li>
+        <li>
+          <div class="about-feature-icon"><span>💎</span></div>
+          <div>
+            <h4>Unique Designs</h4>
+            <p>Personalized for you — never two clients alike.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+
+ 
+
+
+    
+
+<div class="about-visual">
+  <a href="{% url 'home' %}">
+    <div class="about-visual-frame">
+      <img src="{% static 'images/qrtest.png' %}" alt="Manicura" class="about-visual-image">
+    </div>
+  </a>
+</div>
+  
+
+{% comment %}
+  <details class="faq-item">
+    <summary>How do I prepare for my appointment?</summary>
+    <p>Come with clean, product-free nails. Avoid lotions 24h before gel services.</p>
+  </details>
+  
+  <style>
+    .faq-item {
+      border: 1px solid rgba(201,169,110,0.2);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .faq-item summary {
+      padding: 16px 20px;
+      font-weight: 600;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.5);
+    }
+    .faq-item summary::after {
+      content: '+';
+      font-size: 1.2rem;
+      transition: transform 0.2s;
+    }
+    .faq-item[open] summary::after {
+      transform: rotate(45deg);
+    }
+    .faq-item p {
+      padding: 0 20px 16px;
+      color: #6B5B53;
+      line-height: 1.6;
+    }
+  </style>
+{% endcomment %}
+  
+
+
+
+
+{% comment %}
+  
+  
+  
+  
+  
+  <style>
+  
+        /* ─── TESTIMONIALS SECTION ────────────────────────────────────── */
+  .testimonials-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+  
+  .testimonial-card {
+    background: var(--color-surface);
+    border: var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition-smooth);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .testimonial-card::before {
+    content: '"';
+    position: absolute;
+    top: -10px;
+    right: 20px;
+    font-family: 'Playfair Display', serif;
+    font-size: 6rem;
+    color: rgba(201, 169, 110, 0.08);
+    line-height: 1;
+    pointer-events: none;
+  }
+  
+  .testimonial-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-elevated);
+    border-color: rgba(201, 169, 110, 0.3);
+  }
+  
+  .testimonial-stars {
+    color: #F59E0B;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  
+  .testimonial-text {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin-bottom: 20px;
+    flex: 1;
+    font-style: italic;
+  }
+  
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: var(--border-light);
+  }
+  
+  .testimonial-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(201, 169, 110, 0.15);
+    color: var(--color-primary-dark);
+    display: grid;
+    place-items: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  
+  .testimonial-name {
+    font-size: 0.9rem;
+    color: var(--color-text);
+    display: block;
+  }
+  
+  .testimonial-role {
+    font-size: 0.8rem;
+    color: var(--color-text-light);
+  }
+  
+  /* ─── Mobile Adjustments ──────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .testimonials-grid {
+      grid-template-columns: 1fr !important;
+      gap: 16px !important;
+    }
+    .testimonial-card {
+      padding: 20px !important;
+    }
+    .testimonial-text {
+      font-size: 0.9rem !important;
+    }
+    .testimonial-card::before {
+      font-size: 4rem !important;
+      top: -5px !important;
+      right: 15px !important;
+    }
+  }
+  </style>
+  {# ─── TESTIMONIALS ───────────────────────────────────────────────── #}
+  <section class="section" id="testimonials">
+    <div class="container">
+      <div class="testimonials-header">
+        <span class="section-eyebrow">Client Love</span>
+        <h2 class="section-title">What Our Clients Say</h2>
+      </div>
+  
+      <div class="testimonials-grid">
+        {# 🔄 OPCIÓN A: Estático (usa este ahora) #}
+        <article class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"Absolutely love my nails! The technicians are so skilled and the ambiance is incredibly relaxing. Will definitely be back!"</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">SA</div>
+            <div class="testimonial-info">
+              <strong class="testimonial-name">Sarah A.</strong>
+              <span class="testimonial-role">Regular Client</span>
+            </div>
+          </div>
+        </article>
+  
+        <article class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"Gel nails lasted 3+ weeks without chipping. Best nail salon I've ever been to — highly recommend the spa package!"</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar" style="background: rgba(255, 150, 150, 0.15); color: #C95050;">ML</div>
+            <div class="testimonial-info">
+              <strong class="testimonial-name">Maria L.</strong>
+              <span class="testimonial-role">Loyal Client</span>
+            </div>
+          </div>
+        </article>
+  
+        <article class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"Online booking is so convenient! Got the nail art I wanted and the result was beyond my expectations."</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">JK</div>
+            <div class="testimonial-info">
+              <strong class="testimonial-name">Jenny K.</strong>
+              <span class="testimonial-role">New Client</span>
+            </div>
+          </div>
+        </article>
+  
+      
+      </div>
+    </div>
+  </section>
+  
+  
+  
+  
+  
+  
+  
+  
+{% endcomment %}
+  
+
+
+
+
+
+
+{% comment %}
+  <section class="section" id="testimonials">
+    <div class="container">
+      <p class="section-eyebrow">Reviews</p>
+      <h2 class="section-title">What Our Clients Say</h2>
+      
+      <div class="testimonials-grid">
+        {% for t in testimonios %}
+        <article class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"{{ t.comentario|truncatewords:25 }}"</p>
+          <footer class="testimonial-author">
+            <strong>{{ t.nombre_cliente }}</strong>
+            <span class="testimonial-date">{{ t.fecha|date:"M Y" }}</span>
+          </footer>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+    
+{% endcomment %}
+  
+  
+  </div>
+</section>
+
+{# ─── BOOK CTA STRIP ─────────────────────────────────────────── #}
+<section class="section-cta-strip">
+  <div class="container cta-strip-inner">
+    <div>
+      <h3>Ready for your nail moment?</h3>
+      <p>Book in 60 seconds, no calls needed.</p>
+    </div>
+   
+   {% comment %}
+     <a href="{% url 'bookings:select_worker' %}" class="btn btn-primary btn-lg">
+       Book Now
+     </a>
+   {% endcomment %}
+    
+  </div>
+</section>
+
+{% endblock %}

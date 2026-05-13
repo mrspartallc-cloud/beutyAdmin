@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Slot already taken{% endblock %}
+
+{% block content %}
+<section class="section section-booking-flow">
+  <div class="container">
+    <div class="success-card card" style="max-width:560px;">
+      <div class="success-icon" style="background:#fde0e0;color:#b94e4e;">!</div>
+      <h1 class="success-title">We're very sorry…</h1>
+      <p class="success-lead">
+        Another client just booked <strong>{{ hora|time:"H:i" }}</strong> the
+        <strong>{{ fecha|date:"l, F j, Y" }}</strong> with
+        <strong>@{{ worker.nickname }}</strong> before you.
+        Return to the calendar and pick another available time.
+      </p>
+      <div class="success-actions">
+        <a href="{% url 'bookings:worker_detail' worker.nickname %}" class="btn btn-primary">
+          View availability
+        </a>
+        <a href="{% url 'bookings:select_worker' %}" class="btn btn-ghost">
+          Choose another technician
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

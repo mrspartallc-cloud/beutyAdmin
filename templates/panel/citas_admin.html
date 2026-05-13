@@ -1,0 +1,396 @@
+{% extends 'panel/base_panel.html' %}
+{% block title %}Appointments · Admin{% endblock %}
+
+{% block content %}
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   DATATABLE IMPROVEMENTS ONLY - No changes to existing colors
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Table Improvements ────────────────────────────────────────────────── */
+.table-scroll {
+  overflow-x: auto;
+  padding: 0 28px 28px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.data-table thead {
+  background: linear-gradient(135deg, #FFF8F0 0%, #FFF5E8 100%);
+  border-bottom: 2px solid rgba(201, 169, 110, 0.25);
+}
+
+.data-table thead th {
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 700;
+  color: #6B5B53;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.data-table tbody tr {
+  border-bottom: 1px solid rgba(201, 169, 110, 0.1);
+  transition: background 0.2s;
+}
+
+.data-table tbody tr:hover {
+  background: linear-gradient(90deg, rgba(201, 169, 110, 0.04), transparent);
+}
+
+.data-table tbody td {
+  padding: 14px 16px;
+  color: #2D2424;
+  vertical-align: middle;
+}
+
+.data-table tbody td strong {
+  font-weight: 700;
+  color: #2D2424;
+}
+
+.col-actions {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* ─── Pills (Status Badges) - KEEP EXISTING ─────────────────────────────── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.pill-pendiente {
+  background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+  color: #92400E;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.pill-confirmada {
+  background: linear-gradient(135deg, #DBEAFE, #BFDBFE);
+  color: #1E40AF;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.pill-completada {
+  background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+  color: #065F46;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.pill-cancelada {
+  background: linear-gradient(135deg, #FEE2E2, #FECACA);
+  color: #991B1B;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+/* ─── Action Links - IMPROVED ───────────────────────────────────────────── */
+.link-edit,
+.link-danger {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 8px;
+  transition: color 0.3s;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+
+.link-edit {
+  color: #A8884B;
+}
+
+.link-edit:hover {
+  color: #C9A96E;
+  text-decoration: underline;
+}
+
+.link-danger {
+  color: #DC2626;
+}
+
+.link-danger:hover {
+  color: #991B1B;
+  text-decoration: underline;
+}
+
+/* ─── DataTables Plugin Styling ─────────────────────────────────────────── */
+.dataTables_wrapper .dataTables_length {
+  margin-bottom: 20px;
+}
+
+.dataTables_wrapper .dataTables_length select {
+  padding: 8px 16px;
+  border: 1.5px solid rgba(201, 169, 110, 0.25);
+  border-radius: 8px;
+  background: linear-gradient(135deg, #FFFFFF, #FFFBF7);
+  color: #2D2424;
+  font-size: 0.9rem;
+  margin: 0 8px;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.dataTables_wrapper .dataTables_length select:focus {
+  border-color: #C9A96E;
+  outline: none;
+}
+
+.dataTables_wrapper .dataTables_filter {
+  margin-bottom: 20px;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+  padding: 10px 16px;
+  border: 1.5px solid rgba(201, 169, 110, 0.25);
+  border-radius: 10px;
+  background: linear-gradient(135deg, #FFFFFF, #FFFBF7);
+  color: #2D2424;
+  font-size: 0.9rem;
+  margin-left: 8px;
+  transition: all 0.3s;
+}
+
+.dataTables_wrapper .dataTables_filter input:focus {
+  border-color: #C9A96E;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 4px rgba(201, 169, 110, 0.1);
+  outline: none;
+}
+
+.dataTables_wrapper .dataTables_info {
+  color: #6B5B53;
+  font-size: 0.85rem;
+  padding-top: 16px;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+  padding-top: 16px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  padding: 8px 16px;
+  margin: 0 4px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(201, 169, 110, 0.25);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 251, 247, 0.8));
+  color: #6B5B53 !important;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background: linear-gradient(135deg, rgba(201, 169, 110, 0.12), rgba(168, 136, 75, 0.08)) !important;
+  border-color: rgba(201, 169, 110, 0.35) !important;
+  color: #A8884B !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: linear-gradient(135deg, #C9A96E, #B8985D) !important;
+  border-color: transparent !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 12px rgba(168, 136, 75, 0.3);
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── Empty State ───────────────────────────────────────────────────────── */
+.empty-state {
+  padding: 60px 28px;
+  text-align: center;
+  color: #8B7355;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.empty-state p {
+  margin: 0;
+}
+
+/* ─── Responsive ────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .table-scroll {
+    padding: 0 16px 16px;
+  }
+  
+  .data-table {
+    font-size: 0.85rem;
+  }
+  
+  .data-table thead th,
+  .data-table tbody td {
+    padding: 10px 8px;
+  }
+}
+</style>
+
+<div class="page-head">
+  <div>
+    <p class="eyebrow">Administration</p>
+    <h1 class="page-title">Registered Appointments</h1>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'panel:calendario_admin' %}" class="btn btn-ghost btn-sm">
+      📅 View calendar
+    </a>
+  </div>
+</div>
+
+{# ── Quick status summary ── #}
+<div class="metrics-grid">
+  <div class="metric-card metric-card-accent">
+    <span class="metric-label">Pendings</span>
+    <span class="metric-value">{{ estados_count.pendiente|default:0 }}</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-label">Confirmeds</span>
+    <span class="metric-value">{{ estados_count.confirmada|default:0 }}</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-label">Completed</span>
+    <span class="metric-value">{{ estados_count.completada|default:0 }}</span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-label">Unassigned</span>
+    <span class="metric-value">{{ sin_asignar_count|default:0 }}</span>
+    {% if sin_asignar_count %}
+      <a href="?nick=__sin__" class="metric-link">View →</a>
+    {% endif %}
+  </div>
+</div>
+
+{# ── Filtros ──────────────────────────────────────── #}
+<div class="card">
+  <div class="card-head" style="flex-wrap:wrap;gap:12px;">
+    <h2 style="margin:0;">Listing</h2>
+    <form method="get" class="filter-form" style="display:flex;gap:8px;flex-wrap:wrap;">
+      <select name="estado" class="form-control" style="min-width:160px;"
+              onchange="this.form.submit()">
+        <option value="">All states</option>
+        {% for code, label in estados %}
+          <option value="{{ code }}" {% if filtro_estado == code %}selected{% endif %}>
+            {{ label }}
+          </option>
+        {% endfor %}
+      </select>
+      <select name="nick" class="form-control" style="min-width:200px;"
+              onchange="this.form.submit()">
+        <option value="">All technicians</option>
+        <option value="__sin__" {% if filtro_nick == '__sin__' %}selected{% endif %}>
+          ⚠ Unassigned
+        </option>
+        {% for t in trabajadoras %}
+          <option value="{{ t.nickname }}" {% if filtro_nick == t.nickname %}selected{% endif %}>
+            @{{ t.nickname }}
+          </option>
+        {% endfor %}
+      </select>
+      {% if filtro_estado or filtro_nick %}
+        <a href="{% url 'panel:citas_admin' %}" class="btn btn-ghost btn-sm">Clear</a>
+      {% endif %}
+    </form>
+  </div>
+
+  {% if citas %}
+    <div class="table-scroll">
+      <table class="data-table" id="tablaAppointments">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Client</th>
+            <th>Phone</th>
+            <th>Technician</th>
+            <th>Service</th>
+            <th>Status</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in citas %}
+            <tr>
+              <td>{{ c.fecha|date:"m/d/Y" }}</td>
+              <td>{{ c.hora|time:"H:i" }}</td>
+              <td><strong>{{ c.nombre_cliente }}</strong></td>
+              <td>{{ c.telefono }}</td>
+              <td>
+                {% if c.trabajadora %}
+                  @{{ c.trabajadora.nickname }}
+                {% else %}
+                  <span class="pill pill-pendiente">⚠ Unassigned</span>
+                {% endif %}
+              </td>
+              <td>{{ c.servicio.nombre }}</td>
+              <td><span class="pill pill-{{ c.estado }}">{{ c.get_estado_display }}</span></td>
+              <td class="col-actions">
+                {% if not c.trabajadora and c.estado != 'cancelada' %}
+                  <a href="{% url 'panel:cita_asignar' c.pk %}" class="link-edit">Assign</a>
+                {% endif %}
+                {% if c.estado == 'pendiente' and c.trabajadora %}
+                  <form method="post" action="{% url 'panel:cita_aceptar' c.pk %}" style="display:inline;">
+                    {% csrf_token %}<button class="link-edit" type="submit">Accept</button>
+                  </form>
+                {% endif %}
+                {% if c.estado == 'confirmada' %}
+                  <form method="post" action="{% url 'panel:cita_completar' c.pk %}" style="display:inline;">
+                    {% csrf_token %}<button class="link-edit" type="submit">Complete</button>
+                  </form>
+                {% endif %}
+                {% if c.estado != 'cancelada' and c.estado != 'completada' %}
+                  <form method="post" action="{% url 'panel:cita_rechazar' c.pk %}" style="display:inline;">
+                    {% csrf_token %}<button class="link-danger" type="submit"
+                      onclick="return confirm('Cancel this appointment?')">Cancel</button>
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state"><p>No appointments match the current filters.</p></div>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.jQuery && window.jQuery.fn && window.jQuery.fn.DataTable) {
+      jQuery('#tablaAppointments').DataTable({
+        order: [[0, 'desc'], [1, 'desc']],
+        pageLength: 10,
+        columnDefs: [{ orderable: false, targets: [7] }],
+        language: {
+          search: '🔍 Search:',
+          lengthMenu: 'Show _MENU_ entries',
+          info: 'Showing _START_ to _END_ of _TOTAL_',
+          infoEmpty: '0 records',
+          paginate: { next: 'Next →', previous: '← Previous' },
+          zeroRecords: 'No results found'
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

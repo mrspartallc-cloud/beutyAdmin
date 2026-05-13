@@ -1,0 +1,348 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#FFFAF7">
+  <title>Calendario · Alambra Nails</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FFFAF7;
+      --white: #FFFFFF;
+      --gold: #C9A96E;
+      --gold-dark: #A8884B;
+      --text: #2D2424;
+      --text-muted: #8B7355;
+      --text-light: #6B5B53;
+      --border: rgba(201, 169, 110, 0.2);
+      --pendiente: #F59E0B;
+      --confirmada: #10B981;
+      --completada: #6366F1;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.4;
+      padding: 16px;
+    }
+    
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 16px 0;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 20px;
+    }
+    .title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .count {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      background: var(--white);
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+    .nav {
+      display: flex;
+      gap: 8px;
+    }
+    .nav a {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--white);
+      border: 1px solid var(--border);
+      display: grid;
+      place-items: center;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.2rem;
+      transition: background 0.2s;
+    }
+    .nav a:active, .nav a:focus { 
+      background: rgba(201,169,110,0.1); 
+      outline: none;
+    }
+
+    /* Table Wrapper */
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(168,136,75,0.08);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 800px;
+    }
+    thead {
+      background: linear-gradient(135deg, #FFF8F0, #FFF5E8);
+      position: sticky;
+      top: 0;
+      z-index: 5;
+    }
+    th, td {
+      padding: 12px 10px;
+      border-right: 1px solid var(--border);
+      vertical-align: top;
+      text-align: center;
+    }
+    th:first-child, td:first-child {
+      text-align: left;
+      min-width: 180px;
+      background: var(--white);
+      position: sticky;
+      left: 0;
+      z-index: 3;
+      border-right: 2px solid var(--gold);
+    }
+    th {
+      font-weight: 600;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding: 14px 10px;
+    }
+    th .day-name {
+      display: block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    th .day-num {
+      display: block;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    th.today {
+      background: rgba(201,169,110,0.15);
+      border-bottom: 3px solid var(--gold);
+    }
+    th.today .day-num { color: var(--gold); }
+
+    /* Worker Row */
+    .worker {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+    }
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--gold);
+      flex-shrink: 0;
+    }
+    .avatar-placeholder {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .worker-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+
+    /* Appointments */
+    .appt {
+      background: var(--white);
+      border-radius: 6px;
+      padding: 10px;
+      margin: 6px 0;
+      border-left: 4px solid;
+      text-align: left;
+      box-shadow: 0 2px 6px rgba(168,136,75,0.06);
+    }
+    .appt strong {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .appt span {
+      display: block;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 140px;
+    }
+    .appt small {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-light);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 140px;
+    }
+    .appt-pendiente { border-left-color: var(--pendiente); background: #FFFBEB; }
+    .appt-confirmada { border-left-color: var(--confirmada); background: #ECFDF5; }
+    .appt-completada { border-left-color: var(--completada); background: #EEF2FF; opacity: 0.85; }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 16px;
+      margin-top: 20px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .legend-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border-left: 3px solid;
+    }
+    .legend-dot.pendiente { background: #FFFBEB; border-left-color: var(--pendiente); }
+    .legend-dot.confirmada { background: #ECFDF5; border-left-color: var(--confirmada); }
+    .legend-dot.completada { background: #EEF2FF; border-left-color: var(--completada); }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+      background: var(--white);
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+    .empty-state::before {
+      content: "📅";
+      display: block;
+      font-size: 3rem;
+      margin-bottom: 12px;
+      opacity: 0.6;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      body { padding: 12px; }
+      .header { flex-direction: column; align-items: flex-start; }
+      th:first-child, td:first-child { min-width: 140px; }
+      th .day-num { font-size: 1.2rem; }
+      .appt span, .appt small { max-width: 100px; }
+      .avatar, .avatar-placeholder { width: 36px; height: 36px; font-size: 1rem; }
+      .worker-name { font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div>
+      <div class="title">Workers Schedule</div>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+      <span class="count">{{ n_total }} appointment{{ n_total|pluralize }} this week</span>
+      <nav class="nav">
+        <a href="?w={{ anterior }}" aria-label="Previous week">‹</a>
+        <a href="?w={{ siguiente }}" aria-label="Next week">›</a>
+      </nav>
+    </div>
+  </header>
+
+  {% if grid %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Technician</th>
+            {% now "Y-m-d" as today_iso %}
+            {% for d in dias %}
+              <th class="{% if d|date:'Y-m-d' == today_iso %}today{% endif %}">
+                <span class="day-name">{{ d|date:"l" }}</span>
+                <span class="day-num">{{ d|date:"j" }}</span>
+              </th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for trab, citas_dict in grid.items %}
+            <tr>
+              <td>
+                <div class="worker">
+                  {% if trab.foto %}
+                    <img src="{{ trab.foto.url }}" alt="{{ trab.nickname }}" class="avatar">
+                  {% else %}
+                    <div class="avatar-placeholder">{{ trab.nickname|first|upper }}</div>
+                  {% endif %}
+                  <div>
+                    <div class="worker-name">@{{ trab.nickname }}</div>
+                  </div>
+                </div>
+              </td>
+              {% for d in dias %}
+                <td>
+                  {% for key, c in citas_dict.items %}
+                    {% if key.0 == d %}
+                      <div class="appt appt-{{ c.estado }}">
+                        <strong>{{ c.hora|time:"H:i" }}</strong>
+                        <span>{{ c.nombre_cliente|truncatechars:14 }}</span>
+                        <small>{{ c.servicio.nombre|truncatechars:18 }}</small>
+                      </div>
+                    {% endif %}
+                  {% endfor %}
+                </td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot pendiente"></div> Pending</div>
+      <div class="legend-item"><div class="legend-dot confirmada"></div> Confirmed</div>
+      <div class="legend-item"><div class="legend-dot completada"></div> Completed</div>
+    </div>
+
+  {% else %}
+    <div class="empty-state">
+      <p>No appointments scheduled this week.</p>
+    </div>
+  {% endif %}
+
+</body>
+</html>

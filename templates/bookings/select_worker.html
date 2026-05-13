@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}Book appointment · {{ site.name }}{% endblock %}
+
+{% block content %}
+<section class="section section-booking-flow">
+  <div class="container">
+    <div class="booking-stepper">
+      <div class="step is-active"><span>1</span> Choose technician</div>
+      <div class="step"><span>2</span> Date and time</div>
+      <div class="step"><span>3</span> Your info</div>
+    </div>
+
+    <div class="section-header">
+      <p class="eyebrow">Step 1 — Team</p>
+      <h1 class="section-title">Who would you like to book with?</h1>
+      <p class="section-lead">
+        Find your favorite technician by their nickname, or if you don't know anyone yet,
+        choose <strong>No preference</strong> and we'll match you with someone.
+      </p>
+    </div>
+
+    <form method="get" class="search-bar">
+      <input type="search" name="q" value="{{ q }}"
+             placeholder="Search by nickname (e.g. mara-fit)"
+             class="form-control" autocomplete="off">
+      <button type="submit" class="btn btn-primary btn-sm">Search</button>
+      {% if q %}
+        <a href="{% url 'bookings:select_worker' %}" class="search-clear">Clear</a>
+      {% endif %}
+    </form>
+
+    <div class="workers-grid">
+      {# ── Tarjeta especial: sin preferencia ──────── #}
+      <a href="{% url 'bookings:cualquiera_detail' %}" class="worker-card worker-card-any">
+        <div class="worker-avatar worker-avatar-any">
+          <span>?</span>
+        </div>
+        <h3 class="worker-nick">No preference</h3>
+        <p class="worker-bio">
+          Don't know anyone yet? Pick any open time and we'll assign you to an available technician.
+        </p>
+        <span class="worker-cta">View availability →</span>
+      </a>
+
+      {# ── Technicians ────────────────────────────── #}
+      {% for w in workers %}
+        <a href="{% url 'bookings:worker_detail' w.nickname %}" class="worker-card">
+          <div class="worker-avatar">
+            {% if w.foto %}
+              <img src="{{ w.foto.url }}" alt="@{{ w.nickname }}">
+            {% else %}
+              <span>{{ w.nickname|first|upper }}</span>
+            {% endif %}
+          </div>
+          <h3 class="worker-nick">@{{ w.nickname }}</h3>
+          {% if w.bio %}
+            <p class="worker-bio">{{ w.bio|truncatechars:80 }}</p>
+          {% else %}
+            <p class="worker-bio worker-bio-empty">Tap to view availability</p>
+          {% endif %}
+          <span class="worker-cta">View calendar →</span>
+        </a>
+      {% empty %}
+        {% if not q %}
+          <div class="empty-state" style="grid-column:1/-1;">
+            <p>No technicians registered yet. Choose <strong>No preference</strong>
+               y te avisaremos when haya disponibilidad.</p>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {% if q and not workers %}
+      <div class="empty-state" style="margin-top:24px;">
+        <p>We couldn't find anyone with that nickname. Try another search
+           o elige <strong>No preference</strong>.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,233 @@
+{% load static %}<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#FFFAF7">
+  <title>{{ fecha|date:"M j" }} {{ hora_label }} · {{ site.name }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body {
+      font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+      background: #FFFAF7;
+      color: #2D2424;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    body {
+      padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
+    }
+
+    .qtop {
+      position: sticky; top: 0; z-index: 10;
+      background: rgba(255, 250, 247, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 14px 18px;
+      display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid rgba(201, 169, 110, 0.15);
+    }
+    .qtop a.back {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(201, 169, 110, 0.2);
+      display: grid; place-items: center;
+      color: #2D2424; text-decoration: none; font-size: 1.2rem;
+    }
+    .qtop a.back:active { transform: scale(0.92); }
+    .qtop h1 {
+      font-size: 1.05rem; font-weight: 600;
+      flex: 1; text-transform: capitalize;
+    }
+    .qtop h1 small {
+      display: block;
+      font-size: 0.72rem; color: #6B5B53;
+      font-weight: 400; margin-top: 2px;
+    }
+
+    .qcontent { padding: 18px; }
+
+    .qcita {
+      background: #fff;
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05);
+    }
+    .qcita-head {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .qcita-name {
+      font-size: 1.15rem; font-weight: 700;
+      color: #2D2424;
+    }
+    .qcita-time {
+      padding: 6px 12px;
+      background: linear-gradient(135deg, #C9A96E, #A8884B);
+      color: #fff;
+      border-radius: 100px;
+      font-size: 0.85rem; font-weight: 600;
+    }
+    .qcita-svc {
+      font-size: 0.92rem; color: #6B5B53;
+      margin-bottom: 4px;
+    }
+    .qcita-tel {
+      font-size: 0.85rem; color: #A8884B; font-weight: 500;
+      font-family: monospace;
+    }
+    .qcita-nick {
+      display: inline-block; margin-top: 8px;
+      font-size: 0.75rem; padding: 4px 10px; border-radius: 100px;
+      background: #F5D5D5; color: #91344F; font-weight: 500;
+    }
+    .qcita-nick.is-empty { background: #fef3c7; color: #92400e; }
+
+    .qcita-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px dashed rgba(201, 169, 110, 0.2);
+    }
+    .qbtn {
+      padding: 12px 8px;
+      border: none; border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.82rem; font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: transform 0.15s;
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+    }
+    .qbtn:active { transform: scale(0.95); }
+    .qbtn span { font-size: 1.05rem; }
+    .qbtn-call { background: #d1fae5; color: #065f46; }
+    .qbtn-done { background: linear-gradient(135deg, #C9A96E, #A8884B); color: #fff; }
+    .qbtn-cancel { background: #fee2e2; color: #991b1b; }
+
+    .qcita-notas {
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: #F8E8DC;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      color: #6B5B53;
+      font-style: italic;
+    }
+
+    /* Button to create appointment in this slot */
+    .qcreate {
+      display: flex; align-items: center; gap: 12px;
+      padding: 18px;
+      background: linear-gradient(135deg, #C9A96E, #A8884B);
+      border-radius: 16px;
+      color: #fff;
+      text-decoration: none;
+      box-shadow: 0 8px 20px -8px rgba(168, 136, 75, 0.5);
+      margin-top: 14px;
+    }
+    .qcreate:active { transform: scale(0.98); }
+    .qcreate-icon {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255, 255, 255, 0.25);
+      display: grid; place-items: center;
+      font-size: 1.6rem; font-weight: 300;
+      flex-shrink: 0;
+    }
+    .qcreate-text { flex: 1; }
+    .qcreate-text strong {
+      display: block; font-size: 1rem; font-weight: 600;
+    }
+    .qcreate-text small { font-size: 0.8rem; opacity: 0.85; }
+
+    .pill-pendiente { background: #fef3c7; color: #92400e; }
+    .pill-confirmada { background: #d1fae5; color: #065f46; }
+    .pill-completada { background: #e0e7ff; color: #3730a3; }
+    .qcita-estado {
+      display: inline-block; padding: 3px 10px;
+      border-radius: 100px; font-size: 0.7rem; font-weight: 600;
+      letter-spacing: 0.5px; text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="qtop">
+    <a href="javascript:history.back()" class="back">←</a>
+    <h1>
+      {{ fecha|date:"l, j \d\e F"|capfirst }}
+      <small>a las {{ hora_label }}</small>
+    </h1>
+  </header>
+
+  <main class="qcontent">
+    {% for c in citas %}
+      <article class="qcita">
+        <div class="qcita-head">
+          <div>
+            <div class="qcita-name">{{ c.nombre_cliente }}</div>
+            <span class="qcita-estado pill-{{ c.estado }}">{{ c.get_estado_display }}</span>
+          </div>
+          <div class="qcita-time">{{ c.hora|time:"H:i" }}</div>
+        </div>
+
+        <div class="qcita-svc">💅 {{ c.servicio.nombre }}</div>
+        <div class="qcita-tel">📞 {{ c.telefono }}</div>
+
+        {% if c.trabajadora %}
+          <span class="qcita-nick">@{{ c.trabajadora.nickname }}</span>
+        {% else %}
+          <span class="qcita-nick is-empty">⚠ Unassigned</span>
+        {% endif %}
+
+        {% if c.notas %}
+          <div class="qcita-notas">📝 {{ c.notas }}</div>
+        {% endif %}
+
+        <div class="qcita-actions">
+          <a href="tel:{{ c.telefono }}" class="qbtn qbtn-call">
+            <span>📞</span>Call
+          </a>
+          {% if c.estado != 'completada' %}
+            <form method="post" action="{% url 'panel:quick_complete' c.pk %}">
+              {% csrf_token %}
+              <button type="submit" class="qbtn qbtn-done" style="width:100%;">
+                <span>✓</span>Complete
+              </button>
+            </form>
+          {% else %}
+            <div class="qbtn qbtn-done" style="opacity:0.5;cursor:default;">
+              <span>✓</span>Done
+            </div>
+          {% endif %}
+          {% if c.estado != 'cancelada' %}
+            <form method="post" action="{% url 'panel:quick_cancel' c.pk %}"
+                  onsubmit="return confirm('Cancel this appointment?');">
+              {% csrf_token %}
+              <button type="submit" class="qbtn qbtn-cancel" style="width:100%;">
+                <span>✕</span>Cancel
+              </button>
+            </form>
+          {% endif %}
+        </div>
+      </article>
+    {% endfor %}
+
+    {# ── Button to add another appointment in this slot ── #}
+    <a href="{% url 'panel:quick_new' %}?fecha={{ fecha|date:'Y-m-d' }}&hora={{ hora_int|stringformat:'02d' }}:00"
+       class="qcreate">
+      <div class="qcreate-icon">+</div>
+      <div class="qcreate-text">
+        <strong>Add another appointment</strong>
+        <small>at this time · {{ hora_label }}</small>
+      </div>
+    </a>
+  </main>
+
+</body>
+</html>

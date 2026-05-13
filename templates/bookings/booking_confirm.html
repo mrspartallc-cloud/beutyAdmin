@@ -1,0 +1,504 @@
+{% extends 'base.html' %}
+{% block title %}Confirm appointment · {{ site.name }}{% endblock %}
+
+{% block content %}
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   BOOKING CONFIRMATION PAGE - Premium Styles
+   HTML estructura intacta, solo CSS mejorado
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Section Container ─────────────────────────────────────────────────── */
+.section-booking-flow {
+  padding: 60px 0 80px;
+  background: linear-gradient(180deg, #FFFAF7 0%, #FFF8F3 100%);
+  min-height: calc(100vh - 80px);
+}
+
+/* ─── Booking Stepper (Progress) ────────────────────────────────────────── */
+.booking-stepper {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+}
+
+.booking-stepper .step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-radius: 100px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 251, 247, 0.8));
+  border: 1.5px solid rgba(201, 169, 110, 0.2);
+  color: #8B7355;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: all 0.3s ease;
+}
+
+.booking-stepper .step span {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(201, 169, 110, 0.15);
+  color: #A8884B;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.booking-stepper .step.is-done {
+  background: linear-gradient(135deg, rgba(201, 169, 110, 0.12), rgba(168, 136, 75, 0.08));
+  border-color: rgba(201, 169, 110, 0.3);
+  color: #6B5B53;
+}
+
+.booking-stepper .step.is-done span {
+  background: linear-gradient(135deg, #C9A96E, #B8985D, #A8884B);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(168, 136, 75, 0.25);
+}
+
+.booking-stepper .step.is-active {
+  background: linear-gradient(135deg, #C9A96E, #B8985D, #A8884B);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(168, 136, 75, 0.3);
+  transform: scale(1.02);
+}
+
+.booking-stepper .step.is-active span {
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+}
+
+/* ─── Confirm Grid Layout ───────────────────────────────────────────────── */
+.confirm-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+/* ─── Card Base ─────────────────────────────────────────────────────────── */
+.card {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFFBF7 100%);
+  border: 1.5px solid rgba(201, 169, 110, 0.2);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(168, 136, 75, 0.08);
+}
+
+/* ─── Summary Card (Left) ───────────────────────────────────────────────── */
+.confirm-summary {
+  position: sticky;
+  top: 100px;
+}
+
+.confirm-summary .eyebrow {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.8px;
+  color: #A8884B;
+  margin-bottom: 8px;
+}
+
+.confirm-summary h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2D2424;
+  margin: 0 0 24px;
+  letter-spacing: -0.5px;
+}
+
+.confirm-summary dl {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.confirm-summary dl > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(201, 169, 110, 0.15);
+}
+
+.confirm-summary dl > div:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.confirm-summary dt {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  color: #8B7355;
+}
+
+.confirm-summary dd {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #2D2424;
+  line-height: 1.4;
+}
+
+.confirm-summary dd small {
+  display: block;
+  color: #8B7355;
+  font-weight: 400;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* ─── Booking Form (Right) ──────────────────────────────────────────────── */
+.booking-form h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2D2424;
+  margin: 0 0 28px;
+  letter-spacing: -0.5px;
+}
+
+/* ─── Form Alert ────────────────────────────────────────────────────────── */
+.form-alert {
+  background: linear-gradient(135deg, #FEF2F2, #FEE2E2);
+  color: #991B1B;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border-left: 4px solid #EF4444;
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);
+}
+
+/* ─── Form Row (2 columns) ──────────────────────────────────────────────── */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+/* ─── Form Field ────────────────────────────────────────────────────────── */
+.form-field {
+  margin-bottom: 24px;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #2D2424;
+  letter-spacing: 0.2px;
+}
+
+.form-field input[type="text"],
+.form-field input[type="email"],
+.form-field input[type="tel"],
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 1rem;
+  font-family: 'Inter', -apple-system, sans-serif;
+  color: #2D2424;
+  background: linear-gradient(135deg, #FFFFFF, #FFFBF7);
+  border: 1.5px solid rgba(201, 169, 110, 0.25);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 4px rgba(168, 136, 75, 0.04);
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+  color: #A8998A;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: #C9A96E;
+  box-shadow: 0 0 0 4px rgba(201, 169, 110, 0.12), 0 2px 8px rgba(168, 136, 75, 0.08);
+  background: #FFFBF7;
+}
+
+.form-field select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath fill='%23A8884B' d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 20px;
+  padding-right: 44px;
+}
+
+.form-field textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.6;
+}
+
+/* ─── Form Error ────────────────────────────────────────────────────────── */
+.form-error {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: #DC2626;
+  font-weight: 500;
+}
+
+/* ─── Buttons ───────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 28px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 12px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #C9A96E 0%, #B8985D 50%, #A8884B 100%);
+  color: #FFFFFF;
+  border-color: transparent;
+  box-shadow: 
+    0 4px 16px rgba(168, 136, 75, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-primary:hover {
+  box-shadow: 
+    0 6px 20px rgba(168, 136, 75, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #8B7355;
+  border-color: rgba(201, 169, 110, 0.25);
+}
+
+.btn-ghost:hover {
+  background: rgba(201, 169, 110, 0.08);
+  border-color: rgba(201, 169, 110, 0.35);
+  color: #A8884B;
+}
+
+.btn-sm {
+  padding: 10px 20px;
+  font-size: 0.875rem;
+}
+
+.btn-block {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* ─── Form Disclaimer ───────────────────────────────────────────────────── */
+.form-disclaimer {
+  margin-top: 16px;
+  font-size: 0.8rem;
+  color: #8B7355;
+  line-height: 1.6;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* ─── Responsive ────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .confirm-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  
+  .confirm-summary {
+    position: static;
+    order: 2;
+  }
+  
+  .booking-form {
+    order: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .section-booking-flow {
+    padding: 40px 0 60px;
+  }
+  
+  .booking-stepper {
+    margin-bottom: 32px;
+    gap: 8px;
+  }
+  
+  .booking-stepper .step {
+    padding: 10px 16px;
+    font-size: 0.8rem;
+  }
+  
+  .booking-stepper .step span {
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
+  }
+  
+  .card {
+    padding: 24px;
+  }
+  
+  .confirm-summary h2,
+  .booking-form h2 {
+    font-size: 1.5rem;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .booking-stepper {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .booking-stepper .step {
+    justify-content: center;
+  }
+  
+  .card {
+    padding: 20px;
+    border-radius: 12px;
+  }
+  
+  .confirm-summary h2,
+  .booking-form h2 {
+    font-size: 1.3rem;
+  }
+  
+  .btn {
+    padding: 12px 24px;
+  }
+}
+</style>
+
+<section class="section section-booking-flow">
+  <div class="container">
+    <div class="booking-stepper">
+      <div class="step is-done"><span>1</span> Choose technician</div>
+      <div class="step is-done"><span>2</span> Date and time</div>
+      <div class="step is-active"><span>3</span> Your info</div>
+    </div>
+
+    <div class="confirm-grid">
+      <aside class="card confirm-summary">
+        <p class="eyebrow">Summary</p>
+        <h2>Your appointment</h2>
+        <dl>
+          <div>
+            <dt>Technician</dt>
+            <dd>
+              @{{ worker.nickname }}
+              {% if es_sin_preferencia %}
+                <small>
+                  ✨ Assigned automatically
+                </small>
+              {% endif %}
+            </dd>
+          </div>
+          <div>
+            <dt>Date</dt>
+            <dd>{{ fecha|date:"l, F j, Y" }}</dd>
+          </div>
+          <div>
+            <dt>Time</dt>
+            <dd>{{ hora|time:"H:i" }}</dd>
+          </div>
+        </dl>
+        <a href="{% if es_sin_preferencia %}{% url 'bookings:cualquiera_detail' %}{% else %}{% url 'bookings:worker_detail' worker.nickname %}{% endif %}"
+           class="btn btn-ghost btn-sm" style="margin-top:18px;">
+          ← Change date/time
+        </a>
+      </aside>
+
+      <form method="post" class="card booking-form" novalidate>
+        {% csrf_token %}
+        <h2 style="margin-top:0;">Your info</h2>
+
+        {% if form.non_field_errors %}
+          <div class="form-alert">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="{{ form.nombre_cliente.id_for_label }}">{{ form.nombre_cliente.label }} *</label>
+            {{ form.nombre_cliente }}
+            {% if form.nombre_cliente.errors %}<small class="form-error">{{ form.nombre_cliente.errors|join:" " }}</small>{% endif %}
+          </div>
+          <div class="form-field">
+            <label for="{{ form.telefono.id_for_label }}">{{ form.telefono.label }} *</label>
+            {{ form.telefono }}
+            {% if form.telefono.errors %}<small class="form-error">{{ form.telefono.errors|join:" " }}</small>{% endif %}
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+          {{ form.email }}
+          {% if form.email.errors %}<small class="form-error">{{ form.email.errors|join:" " }}</small>{% endif %}
+        </div>
+
+        <div class="form-field">
+          <label for="{{ form.servicio.id_for_label }}">{{ form.servicio.label }} *</label>
+          {{ form.servicio }}
+          {% if form.servicio.errors %}<small class="form-error">{{ form.servicio.errors|join:" " }}</small>{% endif %}
+        </div>
+
+        <div class="form-field">
+          <label for="{{ form.notas.id_for_label }}">{{ form.notas.label }}</label>
+          {{ form.notas }}
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">
+          Confirm booking
+        </button>
+        <p class="form-disclaimer">
+          By booking, you agree we may contact you to confirm the appointment.
+          We don't share your information with third parties.
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,806 @@
+{% load static %}<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#C9A96E">
+  <title>Calendar · {{ site.name }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      -webkit-tap-highlight-color: transparent; 
+    }
+    
+    html, body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: 
+        radial-gradient(circle at 20% 20%, rgba(201, 169, 110, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(168, 136, 75, 0.06) 0%, transparent 50%),
+        linear-gradient(180deg, #FFFCF9 0%, #FFF8F0 100%);
+      color: #2D2424;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    
+    body {
+      padding: env(safe-area-inset-top) 0 calc(80px + env(safe-area-inset-bottom)) 0;
+    }
+
+    /* ── Topbar ENERGÉTICO ───────────────────────── */
+    .qtop {
+      position: sticky; 
+      top: 0; 
+      z-index: 10;
+      background: 
+        linear-gradient(135deg, 
+          rgba(255, 255, 255, 0.98) 0%, 
+          rgba(255, 252, 249, 0.98) 50%,
+          rgba(255, 248, 240, 0.98) 100%);
+      backdrop-filter: blur(30px) saturate(180%);
+      -webkit-backdrop-filter: blur(30px) saturate(180%);
+      padding: 18px 20px 14px;
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      border-bottom: 3px solid;
+      border-image: linear-gradient(90deg, 
+        rgba(201, 169, 110, 0.3), 
+        rgba(201, 169, 110, 0.6), 
+        rgba(201, 169, 110, 0.3)) 1;
+      box-shadow: 
+        0 4px 20px rgba(201, 169, 110, 0.12),
+        0 2px 8px rgba(168, 136, 75, 0.08);
+    }
+    
+    .qtop-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem; 
+      font-weight: 800;
+      background: linear-gradient(135deg, #C9A96E 0%, #A8884B 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+      text-align: center;
+      flex: 1;
+      text-shadow: 0 2px 10px rgba(201, 169, 110, 0.15);
+    }
+    
+    .qtop-title small {
+      display: block;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.72rem; 
+      color: #A8884B;
+      font-weight: 700; 
+      margin-top: 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      background: none;
+      -webkit-text-fill-color: #A8884B;
+    }
+    
+    .qtop-actions { 
+      display: flex; 
+      gap: 12px; 
+    }
+    
+    .qtop-btn {
+      width: 46px; 
+      height: 46px; 
+      border-radius: 12px;
+      background: linear-gradient(135deg, #FFFFFF 0%, #FFF8F0 100%);
+      border: 2px solid rgba(201, 169, 110, 0.3);
+      display: grid; 
+      place-items: center;
+      color: #C9A96E; 
+      text-decoration: none; 
+      font-size: 1.4rem;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 
+        0 4px 12px rgba(201, 169, 110, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .qtop-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        0 6px 16px rgba(201, 169, 110, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      border-color: rgba(201, 169, 110, 0.5);
+    }
+    
+    .qtop-btn:active { 
+      transform: translateY(0) scale(0.96); 
+      box-shadow: 
+        0 2px 8px rgba(201, 169, 110, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    /* ── Day header VIBRANTE ────────────── */
+    .qweek {
+      position: sticky; 
+      top: 82px; 
+      z-index: 9;
+      background: 
+        linear-gradient(135deg, 
+          rgba(255, 255, 255, 0.98) 0%, 
+          rgba(255, 252, 249, 0.98) 100%);
+      backdrop-filter: blur(25px) saturate(160%);
+      -webkit-backdrop-filter: blur(25px) saturate(160%);
+      padding: 12px 16px 14px;
+      border-bottom: 2px solid rgba(201, 169, 110, 0.2);
+      box-shadow: 
+        0 4px 16px rgba(201, 169, 110, 0.1),
+        0 2px 6px rgba(168, 136, 75, 0.05);
+    }
+    
+    .qweek-row {
+      display: grid;
+      grid-template-columns: 46px repeat(7, 1fr);
+      gap: 8px;
+      align-items: center;
+    }
+    
+    .qweek-corner { /* empty corner */ }
+    
+    .qweek-day {
+      text-align: center;
+      padding: 10px 4px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #FFFFFF 0%, #FFFCF9 100%);
+      border: 2px solid rgba(201, 169, 110, 0.15);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 
+        0 2px 8px rgba(168, 136, 75, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+    
+    .qweek-day:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        0 4px 12px rgba(168, 136, 75, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+    }
+    
+    .qweek-dayname {
+      font-size: 0.62rem; 
+      font-weight: 800;
+      letter-spacing: 1.4px; 
+      text-transform: uppercase;
+      color: #A8884B;
+      margin-bottom: 5px;
+    }
+    
+    .qweek-daynum {
+      font-size: 1.1rem; 
+      font-weight: 700;
+      color: #2D2424;
+    }
+    
+    /* ✨ HOY - Día Actual BRILLANTE */
+    .qweek-day.is-today {
+      background: linear-gradient(135deg, #D4AF6F 0%, #C9A96E 50%, #B8985D 100%);
+      border-color: transparent;
+      box-shadow: 
+        0 6px 20px rgba(201, 169, 110, 0.45),
+        0 3px 12px rgba(168, 136, 75, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.4);
+      transform: scale(1.05);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 
+          0 6px 20px rgba(201, 169, 110, 0.45),
+          0 3px 12px rgba(168, 136, 75, 0.3),
+          inset 0 2px 0 rgba(255, 255, 255, 0.4);
+      }
+      50% {
+        box-shadow: 
+          0 8px 28px rgba(201, 169, 110, 0.6),
+          0 4px 16px rgba(168, 136, 75, 0.4),
+          inset 0 2px 0 rgba(255, 255, 255, 0.5);
+      }
+    }
+    
+    .qweek-day.is-today .qweek-daynum {
+      color: #FFFFFF;
+      font-weight: 800;
+      text-shadow: 0 2px 6px rgba(45, 36, 36, 0.2);
+    }
+    
+    .qweek-day.is-today .qweek-dayname { 
+      color: rgba(255, 255, 255, 0.95);
+      font-weight: 800;
+      text-shadow: 0 1px 4px rgba(45, 36, 36, 0.15);
+    }
+    
+    /* 🌫️ PASADO - Días Pasados Sutiles */
+    .qweek-day.is-past {
+      opacity: 0.45;
+      background: linear-gradient(135deg, #F9F6F3 0%, #F5F0EA 100%);
+      border-color: rgba(201, 169, 110, 0.08);
+      transform: scale(0.96);
+    }
+    
+    .qweek-day.is-past .qweek-dayname,
+    .qweek-day.is-past .qweek-daynum {
+      color: #9B8B83;
+    }
+
+    /* ── Grilla DINÁMICA ────────────────────────── */
+    .qgrid {
+      padding: 12px 16px 24px;
+    }
+    
+    .qrow {
+      display: grid;
+      grid-template-columns: 46px repeat(7, 1fr);
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .qhour {
+      font-size: 0.72rem;
+      color: #B8985D;
+      text-align: right;
+      padding-right: 8px;
+      padding-top: 18px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+    }
+    
+    .qcell {
+      aspect-ratio: 1;
+      min-height: 44px;
+      border-radius: 12px;
+      background: #FFFFFF;
+      border: 2px solid rgba(201, 169, 110, 0.18);
+      display: grid; 
+      place-items: center;
+      cursor: pointer;
+      font-size: 0.68rem;
+      font-weight: 700;
+      position: relative;
+      box-shadow: 
+        0 2px 8px rgba(168, 136, 75, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .qcell:hover {
+      transform: translateY(-3px) scale(1.02);
+    }
+    
+    .qcell:active { 
+      transform: translateY(0) scale(0.98); 
+      transition: all 0.1s;
+    }
+
+    /* 🚫 Cerrado */
+    .qcell--closed {
+      background: linear-gradient(135deg, #F5F0EA 0%, #EDE8E2 100%);
+      border-color: rgba(201, 169, 110, 0.1);
+      cursor: default;
+      opacity: 0.6;
+    }
+    
+    .qcell--closed:hover,
+    .qcell--closed:active { 
+      transform: none; 
+    }
+    
+    /* ✅ Libre - INVITA A RESERVAR */
+    .qcell--libre {
+      background: 
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 1) 0%, rgba(255, 252, 249, 1) 100%);
+      border-color: rgba(201, 169, 110, 0.25);
+      box-shadow: 
+        0 2px 8px rgba(168, 136, 75, 0.08),
+        inset 0 2px 0 rgba(255, 255, 255, 1),
+        inset 0 -2px 8px rgba(201, 169, 110, 0.03);
+    }
+    
+    .qcell--libre:hover {
+      border-color: rgba(201, 169, 110, 0.5);
+      background: 
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 1) 0%, rgba(255, 248, 240, 1) 100%);
+      box-shadow: 
+        0 4px 16px rgba(201, 169, 110, 0.18),
+        inset 0 2px 0 rgba(255, 255, 255, 1),
+        inset 0 -2px 12px rgba(201, 169, 110, 0.06);
+    }
+    
+    /* 🎯 Ocupada - VIBRANTE Y DORADA */
+    .qcell--busy {
+      background: 
+        linear-gradient(135deg, 
+          #D4AF6F 0%, 
+          #C9A96E 30%, 
+          #B8985D 70%, 
+          #A8884B 100%);
+      color: #FFFFFF;
+      border-color: transparent;
+      box-shadow: 
+        0 4px 16px rgba(201, 169, 110, 0.4),
+        0 2px 8px rgba(168, 136, 75, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+      font-weight: 800;
+      text-shadow: 0 1px 3px rgba(45, 36, 36, 0.2);
+    }
+    
+    .qcell--busy:hover {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 
+        0 6px 24px rgba(201, 169, 110, 0.5),
+        0 3px 12px rgba(168, 136, 75, 0.35),
+        inset 0 2px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+    }
+    
+    .qcell--busy::after {
+      content: attr(data-n) " appts";
+      font-size: 0.58rem;
+      letter-spacing: 0.6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    }
+    
+    .qcell--busy[data-n="1"]::after { 
+      content: "1 appt"; 
+    }
+    
+    /* ⭐ Celda del Día Actual */
+    .qcell.is-today-cell {
+      box-shadow: 
+        inset 0 0 0 3px rgba(201, 169, 110, 0.7),
+        0 4px 16px rgba(201, 169, 110, 0.25),
+        0 2px 8px rgba(168, 136, 75, 0.15);
+      animation: glow 2.5s ease-in-out infinite;
+    }
+    
+    @keyframes glow {
+      0%, 100% {
+        box-shadow: 
+          inset 0 0 0 3px rgba(201, 169, 110, 0.7),
+          0 4px 16px rgba(201, 169, 110, 0.25),
+          0 2px 8px rgba(168, 136, 75, 0.15);
+      }
+      50% {
+        box-shadow: 
+          inset 0 0 0 3px rgba(201, 169, 110, 0.9),
+          0 6px 24px rgba(201, 169, 110, 0.4),
+          0 3px 12px rgba(168, 136, 75, 0.25);
+      }
+    }
+    
+    .qcell.is-today-cell.qcell--busy {
+      box-shadow: 
+        inset 0 0 0 3px rgba(255, 255, 255, 0.6),
+        0 6px 24px rgba(201, 169, 110, 0.5),
+        0 3px 12px rgba(168, 136, 75, 0.35);
+    }
+
+    /* 🌫️ CELDAS PASADAS - Discretas */
+    .qcell.is-past {
+      opacity: 0.35;
+      pointer-events: none;
+      cursor: not-allowed;
+      background: 
+        repeating-linear-gradient(
+          45deg,
+          rgba(139, 115, 85, 0.03),
+          rgba(139, 115, 85, 0.03) 12px,
+          transparent 12px,
+          transparent 24px
+        ) !important;
+      border-color: rgba(201, 169, 110, 0.08) !important;
+      box-shadow: none !important;
+    }
+    
+    .qcell.is-past:hover,
+    .qcell.is-past:active {
+      transform: none;
+    }
+    
+    .qcell.is-past.qcell--busy {
+      background: 
+        repeating-linear-gradient(
+          45deg,
+          rgba(201, 169, 110, 0.12),
+          rgba(201, 169, 110, 0.12) 12px,
+          rgba(201, 169, 110, 0.04) 12px,
+          rgba(201, 169, 110, 0.04) 24px
+        ) !important;
+      color: rgba(45, 36, 36, 0.4) !important;
+      text-shadow: none !important;
+    }
+
+    /* ── Leyenda ELEGANTE ──────────────────────── */
+    .qlegend {
+      display: flex; 
+      justify-content: center; 
+      gap: 24px; 
+      flex-wrap: wrap;
+      padding: 22px 18px;
+      margin: 16px 16px;
+      font-size: 0.78rem;
+      color: #6B5B53;
+      background: 
+        linear-gradient(135deg, 
+          rgba(255, 255, 255, 0.95) 0%, 
+          rgba(255, 252, 249, 0.95) 100%);
+      border-radius: 16px;
+      border: 2px solid rgba(201, 169, 110, 0.2);
+      box-shadow: 
+        0 4px 16px rgba(168, 136, 75, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+    
+    .qlegend-item { 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+      font-weight: 600;
+    }
+    
+    .qlegend-dot {
+      width: 20px; 
+      height: 16px; 
+      border-radius: 6px;
+      box-shadow: 
+        0 2px 6px rgba(0, 0, 0, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+    
+    .qlegend-dot--busy {
+      background: linear-gradient(135deg, #D4AF6F, #C9A96E, #A8884B);
+    }
+    
+    .qlegend-dot--libre {
+      background: linear-gradient(135deg, #FFFFFF, #FFFCF9);
+      border: 2px solid rgba(201, 169, 110, 0.35);
+    }
+    
+    .qlegend-dot--closed {
+      background: linear-gradient(135deg, #F5F0EA, #EDE8E2);
+      border: 1px solid rgba(201, 169, 110, 0.2);
+    }
+
+    /* ── Bottom nav PREMIUM ───────────────────────── */
+    .qnav {
+      position: fixed;
+      bottom: 0; 
+      left: 0; 
+      right: 0;
+      z-index: 15;
+      background: 
+        linear-gradient(135deg, 
+          rgba(255, 255, 255, 0.98) 0%, 
+          rgba(255, 252, 249, 0.98) 100%);
+      backdrop-filter: blur(30px) saturate(180%);
+      -webkit-backdrop-filter: blur(30px) saturate(180%);
+      border-top: 3px solid;
+      border-image: linear-gradient(90deg, 
+        rgba(201, 169, 110, 0.3), 
+        rgba(201, 169, 110, 0.5), 
+        rgba(201, 169, 110, 0.3)) 1;
+      padding: 10px 0 calc(10px + env(safe-area-inset-bottom));
+      display: grid; 
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      box-shadow: 
+        0 -4px 20px rgba(201, 169, 110, 0.15),
+        0 -2px 8px rgba(168, 136, 75, 0.08);
+    }
+    
+    .qnav a {
+      display: flex; 
+      flex-direction: column; 
+      align-items: center;
+      gap: 4px; 
+      padding: 12px 10px;
+      text-decoration: none; 
+      color: #9B8B83;
+      font-size: 0.7rem; 
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      transition: all 0.3s;
+    }
+    
+    .qnav a span { 
+      font-size: 1.4rem;
+      transition: all 0.3s;
+    }
+    
+    .qnav a.is-active { 
+      color: #C9A96E;
+    }
+    
+    .qnav a.is-active span {
+      transform: scale(1.15);
+      filter: drop-shadow(0 2px 6px rgba(201, 169, 110, 0.4));
+    }
+    
+    .qnav-fab {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .qnav-fab .qnav-fab-btn {
+      width: 62px; 
+      height: 62px;
+      margin-top: -26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #D4AF6F 0%, #C9A96E 50%, #A8884B 100%);
+      color: #FFFFFF;
+      display: grid; 
+      place-items: center;
+      font-size: 2.2rem; 
+      font-weight: 300;
+      box-shadow: 
+        0 8px 24px rgba(201, 169, 110, 0.45),
+        0 4px 12px rgba(168, 136, 75, 0.3),
+        inset 0 3px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+      text-decoration: none;
+      border: 3px solid rgba(255, 255, 255, 0.9);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .qnav-fab .qnav-fab-btn:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 
+        0 12px 32px rgba(201, 169, 110, 0.6),
+        0 6px 16px rgba(168, 136, 75, 0.4),
+        inset 0 3px 0 rgba(255, 255, 255, 0.5),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.15);
+    }
+    
+    .qnav-fab .qnav-fab-btn:active { 
+      transform: translateY(-2px) scale(1); 
+      box-shadow: 
+        0 8px 24px rgba(201, 169, 110, 0.5),
+        0 4px 12px rgba(168, 136, 75, 0.35),
+        inset 0 3px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    /* ── Messages VIBRANTES ───────────────────────── */
+    .qmsg {
+      margin: 16px 20px;
+      padding: 16px 18px;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      border-left: 5px solid;
+    }
+    
+    .qmsg.success { 
+      background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%); 
+      color: #065f46; 
+      border-left-color: #10B981;
+    }
+    
+    .qmsg.warning { 
+      background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); 
+      color: #92400e; 
+      border-left-color: #F59E0B;
+    }
+    
+    .qmsg.error { 
+      background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%); 
+      color: #991b1b; 
+      border-left-color: #EF4444;
+    }
+    
+    /* Back to current week PREMIUM */
+    .back-current {
+      display: block;
+      text-align: center;
+      padding: 14px 18px;
+      margin: 16px 20px;
+      background: linear-gradient(135deg, rgba(212, 175, 111, 0.15), rgba(201, 169, 110, 0.12));
+      border: 2px solid rgba(201, 169, 110, 0.3);
+      border-radius: 14px;
+      color: #C9A96E;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      box-shadow: 
+        0 4px 12px rgba(201, 169, 110, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      transition: all 0.3s;
+    }
+    
+    .back-current:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        0 6px 16px rgba(201, 169, 110, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    }
+    
+    .back-current:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    /* ── Responsive Desktop ─── */
+    @media (min-width: 768px) {
+      body {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding-top: calc(env(safe-area-inset-top) + 24px);
+      }
+      
+      .qtop {
+        border-radius: 20px;
+        margin: 0 24px;
+      }
+      
+      .qweek {
+        border-radius: 16px;
+        margin: 0 24px;
+        top: calc(82px + 24px);
+      }
+      
+      .qgrid {
+        padding: 24px 24px 48px;
+      }
+      
+      .qcell {
+        min-height: 52px;
+      }
+      
+      .qlegend {
+        margin: 24px;
+      }
+      
+      .qnav {
+        max-width: 1200px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 24px 24px 0 0;
+      }
+    }
+
+    /* ── iPhone Safe Area ─── */
+    @supports (padding: max(0px)) {
+      body {
+        padding-left: max(0px, env(safe-area-inset-left));
+        padding-right: max(0px, env(safe-area-inset-right));
+      }
+    }
+  </style>
+</head>
+<body>
+
+  {# ── Topbar with week navigation ── #}
+  <header class="qtop">
+    <div class="qtop-actions">
+      <a href="?w={{ anterior }}" class="qtop-btn" aria-label="Previous week">‹</a>
+    </div>
+    <div class="qtop-title">
+      {{ mes_label }}
+      <small>{{ n_citas }} appointment{{ n_citas|pluralize }} this week</small>
+    </div>
+    <div class="qtop-actions">
+      <a href="?w={{ siguiente }}" class="qtop-btn" aria-label="Next week">›</a>
+    </div>
+  </header>
+
+  {% if not es_actual %}
+    <a href="{% url 'panel:quick_calendar' %}" class="back-current">
+      ← Back to current week
+    </a>
+  {% endif %}
+
+  {% if messages %}
+    {% for m in messages %}
+      <div class="qmsg {{ m.tags }}">{{ m }}</div>
+    {% endfor %}
+  {% endif %}
+
+  {# ── Day header ── #}
+  <div class="qweek">
+    <div class="qweek-row">
+      <div class="qweek-corner"></div>
+      {% for d in dias %}
+        {% now "Y-m-d" as hoy_str %}
+        {% with d_str=d|date:"Y-m-d" %}
+        <div class="qweek-day 
+                    {% if d_str == hoy_str %}is-today{% endif %}
+                    {% if d_str < hoy_str %}is-past{% endif %}">
+          <div class="qweek-dayname">
+            {% if forloop.counter0 == 0 %}MON{% endif %}
+            {% if forloop.counter0 == 1 %}TUE{% endif %}
+            {% if forloop.counter0 == 2 %}WED{% endif %}
+            {% if forloop.counter0 == 3 %}THU{% endif %}
+            {% if forloop.counter0 == 4 %}FRI{% endif %}
+            {% if forloop.counter0 == 5 %}SAT{% endif %}
+            {% if forloop.counter0 == 6 %}SUN{% endif %}
+          </div>
+          <div class="qweek-daynum">{{ d|date:"j" }}</div>
+        </div>
+        {% endwith %}
+      {% endfor %}
+    </div>
+  </div>
+
+  {# ── GRILLA ────────────────────────────────────── #}
+  <div class="qgrid">
+    {% for fila in grilla %}
+      <div class="qrow">
+        <div class="qhour">{{ fila.label }}</div>
+        {% for celda in fila.celdas %}
+          {% if celda.estado == 'cerrado' %}
+            <div class="qcell qcell--closed 
+                        {% if celda.es_hoy %}is-today-cell{% endif %}
+                        {% if celda.es_pasado %}is-past{% endif %}"></div>
+          {% elif celda.estado == 'ocupada' %}
+            <a href="{% url 'panel:quick_day_detail' celda.fecha|date:'Y-m-d' celda.hora %}"
+               class="qcell qcell--busy 
+                      {% if celda.es_hoy %}is-today-cell{% endif %}
+                      {% if celda.es_pasado %}is-past{% endif %}"
+               data-n="{{ celda.n_citas }}"
+               aria-label="{{ celda.n_citas }} appointment{{ celda.n_citas|pluralize }} at {{ fila.label }}"></a>
+          {% else %}
+            <a href="{% url 'panel:quick_new' %}?fecha={{ celda.fecha|date:'Y-m-d' }}&hora={{ celda.hora|stringformat:'02d' }}:00"
+               class="qcell qcell--libre 
+                      {% if celda.es_hoy %}is-today-cell{% endif %}
+                      {% if celda.es_pasado %}is-past{% endif %}"
+               aria-label="Available {{ fila.label }} {{ celda.fecha|date:'M j' }}"></a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+
+  {# ── LEYENDA ──────────────────────────────────── #}
+  <div class="qlegend">
+    <span class="qlegend-item">
+      <span class="qlegend-dot qlegend-dot--busy"></span>
+      Scheduled
+    </span>
+    <span class="qlegend-item">
+      <span class="qlegend-dot qlegend-dot--libre"></span>
+      Available
+    </span>
+    <span class="qlegend-item">
+      <span class="qlegend-dot qlegend-dot--closed"></span>
+      Closed
+    </span>
+  </div>
+
+  {# ── Bottom nav (con FAB en el centro) ────────── #}
+  <nav class="qnav">
+    <a href="{% url 'panel:quick_calendar' %}" class="is-active">
+      <span>📅</span>Calendar
+    </a>
+    <a href="{% url 'panel:quick_home' %}">
+      <span>📋</span>Today
+    </a>
+    <div class="qnav-fab">
+      <a href="{% url 'panel:quick_new' %}" class="qnav-fab-btn" aria-label="New appointment">+</a>
+    </div>
+    <a href="{% url 'panel:dashboard' %}">
+      <span>⊞</span>More
+    </a>
+  </nav>
+</body>
+</html>

@@ -1,0 +1,507 @@
+{% extends 'panel/base_panel.html' %}
+{% load humanize %}
+{% block title %}Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   DASHBOARD - Estilo Premium (igual al Financial Summary)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2D2424;
+  margin: 0;
+}
+
+.page-subtitle {
+  font-size: 0.95rem;
+  color: #6B5B53;
+  margin-top: 8px;
+}
+
+/* ─── Botones de acción header ──────────────────────────────────────────── */
+.page-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.btn-action {
+  padding: 12px 24px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.3s;
+  cursor: pointer;
+  border: 1.5px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-action-primary {
+  background: linear-gradient(135deg, #C9A96E, #B8985D);
+  color: #FFFFFF;
+}
+
+.btn-action-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(168, 136, 75, 0.4);
+}
+
+.btn-action-ghost {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 251, 247, 0.8));
+  color: #6B5B53;
+  border-color: rgba(201, 169, 110, 0.25);
+}
+
+.btn-action-ghost:hover {
+  background: linear-gradient(135deg, rgba(201, 169, 110, 0.12), rgba(168, 136, 75, 0.08));
+  border-color: rgba(201, 169, 110, 0.35);
+}
+
+/* ─── Metrics Grid (igual al resumen) ───────────────────────────────────── */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.metric-card {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFFBF7 100%);
+  border: 1.5px solid rgba(201, 169, 110, 0.2);
+  border-radius: 14px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(168, 136, 75, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(168, 136, 75, 0.15);
+}
+
+.metric-card.highlight {
+  border-left: 4px solid #C9A96E;
+  background: linear-gradient(135deg, #FFF8F0 0%, #FFFBF7 100%);
+}
+
+.metric-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #8B7355;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.metric-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #2D2424;
+  line-height: 1;
+}
+
+.metric-value.positive {
+  color: #059669;
+}
+
+.metric-value.negative {
+  color: #DC2626;
+}
+
+.metric-trend {
+  font-size: 0.85rem;
+  color: #6B5B53;
+  margin-top: 4px;
+}
+
+.metric-link {
+  font-size: 0.85rem;
+  color: #C9A96E;
+  font-weight: 700;
+  text-decoration: none;
+  margin-top: 8px;
+  display: inline-block;
+  transition: all 0.2s;
+}
+
+.metric-link:hover {
+  color: #A8884B;
+  transform: translateX(3px);
+}
+
+/* ─── Data Card (igual al resumen) ──────────────────────────────────────── */
+.data-card {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFFBF7 100%);
+  border: 1.5px solid rgba(201, 169, 110, 0.2);
+  border-radius: 16px;
+  padding: 0;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 20px rgba(168, 136, 75, 0.08);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 24px 28px;
+  border-bottom: 1.5px solid rgba(201, 169, 110, 0.12);
+  background: linear-gradient(135deg, #FFF8F0 0%, #FFF5E8 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.card-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #2D2424;
+  margin: 0;
+}
+
+/* ─── Tables (igual al resumen) ─────────────────────────────────────────── */
+.table-scroll {
+  overflow-x: auto;
+  padding: 0 28px 28px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.data-table thead {
+  background: linear-gradient(135deg, #FFF8F0 0%, #FFF5E8 100%);
+  border-bottom: 2px solid rgba(201, 169, 110, 0.25);
+}
+
+.data-table thead th {
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 700;
+  color: #6B5B53;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.data-table thead th.num {
+  text-align: right;
+}
+
+.data-table tbody tr {
+  border-bottom: 1px solid rgba(201, 169, 110, 0.1);
+  transition: background 0.2s;
+}
+
+.data-table tbody tr:hover {
+  background: linear-gradient(90deg, rgba(201, 169, 110, 0.04), transparent);
+}
+
+.data-table tbody td {
+  padding: 14px 16px;
+  color: #2D2424;
+}
+
+.data-table tbody td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table tbody td.strong {
+  font-weight: 700;
+}
+
+/* ─── Action Links en tabla ─────────────────────────────────────────────── */
+.link-edit, .link-danger {
+  display: inline-block;
+  padding: 6px 12px;
+  margin: 0 4px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.link-edit {
+  background: rgba(201, 169, 110, 0.1);
+  color: #A8884B;
+  border: 1.5px solid rgba(201, 169, 110, 0.3);
+}
+
+.link-edit:hover {
+  background: linear-gradient(135deg, #C9A96E, #B8985D);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.link-danger {
+  background: rgba(220, 38, 38, 0.08);
+  color: #DC2626;
+  border: 1.5px solid rgba(220, 38, 38, 0.3);
+}
+
+.link-danger:hover {
+  background: linear-gradient(135deg, #DC2626, #991B1B);
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* ─── Empty State ───────────────────────────────────────────────────────── */
+.empty-state {
+  padding: 80px 28px;
+  text-align: center;
+  color: #8B7355;
+  font-size: 1rem;
+}
+
+.empty-state-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+/* ─── Eyebrow ───────────────────────────────────────────────────────────── */
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #C9A96E;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+/* ─── Responsive ────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .metric-value {
+    font-size: 1.8rem;
+  }
+  
+  .summary-header {
+    flex-direction: column;
+  }
+  
+  .page-actions {
+    width: 100%;
+  }
+  
+  .btn-action {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  /* Tabla full width en móvil */
+  .data-card {
+    margin-left: -16px;
+    margin-right: -16px;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    width: calc(100% + 32px);
+  }
+  
+  .table-scroll {
+    padding: 0 0 12px 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .data-table {
+    min-width: 700px;
+  }
+  
+  .data-table th:first-child,
+  .data-table td:first-child {
+    padding-left: 20px;
+  }
+  
+  .data-table th:last-child,
+  .data-table td:last-child {
+    padding-right: 20px;
+  }
+  
+  .card-header {
+    padding: 18px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .page-title {
+    font-size: 1.8rem;
+  }
+}
+
+/* ─── Scrollbar dorado SIEMPRE visible ──────────────────────────────────── */
+.table-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #C9A96E rgba(201, 169, 110, 0.08);
+}
+
+.table-scroll::-webkit-scrollbar {
+  height: 12px;
+  -webkit-appearance: none;
+}
+
+.table-scroll::-webkit-scrollbar-track {
+  background: rgba(201, 169, 110, 0.1);
+  border-radius: 10px;
+  margin: 0 8px;
+}
+
+.table-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #C9A96E, #A8884B);
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  min-width: 60px;
+}
+
+.table-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, #A8884B, #8B7355);
+}
+
+.table-scroll::-webkit-scrollbar-thumb:active {
+  background: #8B7355;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+{# ── Header ──────────────────────────────────────────────────────────── #}
+<div class="summary-header">
+  <div>
+    <p class="eyebrow">Summary general</p>
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">Overview of appointments, income, and salon performance</p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'panel:quick_calendar' %}" class="btn-action btn-action-primary" target="_blank">
+      📱 Quick Mode
+    </a>
+    <a href="{% url 'panel:ingreso_create' %}" class="btn-action btn-action-ghost">+ New income</a>
+    <a href="{% url 'panel:resumen' %}" class="btn-action btn-action-ghost">View summary</a> <br><br>
+  </div>
+</div>
+
+{# ── Metrics ──────────────────────────────────────────────────────────── #}
+<div class="metrics-grid">
+  <div class="metric-card highlight">
+    <span class="metric-label">Pending Appointments</span>
+    <span class="metric-value">{{ metrics.citas_pendientes }}</span>
+    <a href="{% url 'panel:citas_admin' %}?estado=pendiente" class="metric-link">View →</a>
+  </div>
+  
+  <div class="metric-card">
+    <span class="metric-label">Total Income</span>
+    <span class="metric-value">${{ metrics.total_clientes|floatformat:2|intcomma }}</span>
+    <span class="metric-trend">Client payments</span>
+  </div>
+  
+  <div class="metric-card">
+    <span class="metric-label">Paid to Team</span>
+    <span class="metric-value">${{ metrics.total_trabajadoras|floatformat:2|intcomma }}</span>
+    <span class="metric-trend">Technician compensation</span>
+  </div>
+  
+  <div class="metric-card highlight">
+    <span class="metric-label">Salon Earnings</span>
+    <span class="metric-value positive">${{ metrics.ganancia_spa|floatformat:2|intcomma }}</span>
+    <span class="metric-trend">Net profit</span>
+  </div>
+</div>
+
+{# ── Tabla de ingresos ──────────────────────────────────────────────────── #}
+<div class="data-card">
+  <div class="card-header">
+    <h2>Recent Income</h2>
+  </div>
+
+  {% if registros %}
+    <div class="table-scroll">
+      <table class="data-table" id="tablaIncome">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Technician</th>
+            <th class="num">Client amount</th>
+            <th class="num">For technician</th>
+            <th class="num">Propina</th>
+            <th class="num">Total</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in registros %}
+            <tr>
+              <td class="strong">{{ r.fecha|date:"M j, Y" }}</td>
+              <td><strong>@{{ r.trabajadora.nickname }}</strong></td>
+              <td class="num">${{ r.monto_original|floatformat:2|intcomma }}</td>
+              <td class="num">${{ r.monto|floatformat:2|intcomma }}</td>
+              <td class="num">${{ r.propina|floatformat:2|intcomma }}</td>
+              <td class="num strong">${{ r.total|floatformat:2|intcomma }}</td>
+              <td class="col-actions">
+                <a href="{% url 'panel:ingreso_update' r.pk %}" class="link-edit">Edit</a>
+                <a href="{% url 'panel:ingreso_delete' r.pk %}" class="link-danger">Delete</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon">💰</div>
+      <p>No income recorded yet.</p>
+      <a href="{% url 'panel:ingreso_create' %}" class="btn-action btn-action-primary" style="margin-top: 16px;">Add the first one</a>
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.jQuery && window.jQuery.fn && window.jQuery.fn.DataTable) {
+      jQuery('#tablaIncome').DataTable({
+        order: [[0, 'desc']],
+        pageLength: 10,
+        language: {
+          search: '🔍 Search:',
+          lengthMenu: 'Show _MENU_ entries',
+          info: 'Showing _START_ to _END_ of _TOTAL_',
+          infoEmpty: '0 records',
+          paginate: { next: 'Next →', previous: '← Previous' },
+          zeroRecords: 'No results found'
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

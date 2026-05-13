@@ -1,0 +1,427 @@
+{% extends 'panel/base_panel.html' %}
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   SERVICE FORM - Premium Design
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2D2424;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+  font-size: 0.95rem;
+  color: #6B5B53;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.page-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ─── Alerts ────────────────────────────────────────────────────────────── */
+.alert {
+  padding: 16px 20px;
+  border-radius: 10px;
+  margin-bottom: 24px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  border: 1.5px solid;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.alert::before {
+  content: '✓';
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.alert-success {
+  background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+  border-color: #10B981;
+  color: #065F46;
+}
+
+.alert-error {
+  background: linear-gradient(135deg, #FEE2E2, #FECACA);
+  border-color: #DC2626;
+  color: #991B1B;
+}
+
+.alert-error::before {
+  content: '✗';
+}
+
+.alert-warning {
+  background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+  border-color: #F59E0B;
+  color: #92400E;
+}
+
+.alert-warning::before {
+  content: '⚠';
+}
+
+/* ─── Card ──────────────────────────────────────────────────────────────── */
+.card {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFFBF7 100%);
+  border: 1.5px solid rgba(201, 169, 110, 0.2);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(168, 136, 75, 0.08);
+}
+
+/* ─── Form Grid ─────────────────────────────────────────────────────────── */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.form-grid-full {
+  grid-column: 1 / -1;
+}
+
+/* ─── Form Field ────────────────────────────────────────────────────────── */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-field label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2D2424;
+  letter-spacing: 0.3px;
+}
+
+/* ─── Form Inputs ───────────────────────────────────────────────────────── */
+.form-field input[type="text"],
+.form-field input[type="number"],
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-family: 'Inter', sans-serif;
+  color: #2D2424;
+  background: linear-gradient(135deg, #FFFFFF 0%, #FFFBF7 100%);
+  border: 1.5px solid rgba(201, 169, 110, 0.25);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.form-field textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  border-color: #C9A96E;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 4px rgba(201, 169, 110, 0.1);
+}
+
+/* Select with custom arrow */
+.form-field select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23C9A96E' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+}
+
+/* ─── Form Hints ────────────────────────────────────────────────────────── */
+.form-hint {
+  font-size: 0.85rem;
+  color: #8B7355;
+  font-style: italic;
+  display: block;
+  margin-top: 4px;
+}
+
+/* ─── Form Errors ───────────────────────────────────────────────────────── */
+.form-error {
+  font-size: 0.85rem;
+  color: #DC2626;
+  font-weight: 600;
+  display: block;
+  margin-top: 4px;
+}
+
+/* ─── Checkboxes Group ──────────────────────────────────────────────────── */
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 16px;
+  background: rgba(201, 169, 110, 0.06);
+  border: 1.5px solid rgba(201, 169, 110, 0.2);
+  border-radius: 10px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #2D2424;
+  transition: color 0.3s;
+}
+
+.checkbox-label:hover {
+  color: #C9A96E;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #C9A96E;
+}
+
+/* ─── Form Actions ──────────────────────────────────────────────────────── */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1.5px dashed rgba(201, 169, 110, 0.25);
+}
+
+/* ─── Buttons ───────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 22px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 10px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #C9A96E 0%, #B8985D 50%, #A8884B 100%);
+  color: #FFFFFF;
+  border-color: transparent;
+  box-shadow: 0 4px 16px rgba(168, 136, 75, 0.3);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 6px 20px rgba(168, 136, 75, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn-ghost {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 251, 247, 0.8));
+  color: #6B5B53;
+  border-color: rgba(201, 169, 110, 0.25);
+}
+
+.btn-ghost:hover {
+  background: linear-gradient(135deg, rgba(201, 169, 110, 0.12), rgba(168, 136, 75, 0.08));
+  border-color: rgba(201, 169, 110, 0.35);
+  color: #A8884B;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #FEE2E2, #FCA5A5);
+  color: #991B1B;
+  border-color: rgba(220, 38, 38, 0.3);
+  margin-left: auto;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #FCA5A5, #F87171);
+  border-color: #DC2626;
+  color: #7F1D1D;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.3);
+}
+
+.btn-sm {
+  padding: 8px 18px;
+  font-size: 0.85rem;
+}
+
+/* ─── Emoji Preview ─────────────────────────────────────────────────────── */
+.emoji-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(201, 169, 110, 0.08);
+  border-radius: 8px;
+  font-size: 1.5rem;
+  margin-top: 8px;
+}
+
+/* ─── Responsive ────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+  }
+  
+  .page-actions {
+    width: 100%;
+  }
+  
+  .card {
+    padding: 24px;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+  
+  .btn-danger {
+    margin-left: 0;
+    order: -1;
+  }
+}
+</style>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">{{ titulo }}</h1>
+    <p class="page-subtitle">
+      {% if obj %}Update the service details below.{% else %}Create a new service for your salon.{% endif %}
+    </p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'panel:servicio_list' %}" class="btn btn-ghost btn-sm">← Back</a>
+  </div>
+</div>
+
+{% if messages %}
+  {% for m in messages %}
+    <div class="alert alert-{{ m.tags }}">{{ m }}</div>
+  {% endfor %}
+{% endif %}
+
+<form method="post" class="card">
+  {% csrf_token %}
+
+  <div class="form-grid">
+    {# ── Service Name (Full Width) ────────────────────────────────────── #}
+    <div class="form-field form-grid-full">
+      <label for="{{ form.nombre.id_for_label }}">Service name *</label>
+      {{ form.nombre }}
+      {% if form.nombre.errors %}
+        <small class="form-error">{{ form.nombre.errors|join:", " }}</small>
+      {% endif %}
+    </div>
+
+    {# ── Category & Icon ──────────────────────────────────────────────── #}
+    <div class="form-field">
+      <label for="{{ form.categoria.id_for_label }}">Category</label>
+      {{ form.categoria }}
+    </div>
+
+    <div class="form-field">
+      <label for="{{ form.icono.id_for_label }}">Icon (emoji)</label>
+      {{ form.icono }}
+      <small class="form-hint">Decorative emoji for the public card.</small>
+    </div>
+
+    {# ── Description (Full Width) ─────────────────────────────────────── #}
+    <div class="form-field form-grid-full">
+      <label for="{{ form.descripcion.id_for_label }}">Description</label>
+      {{ form.descripcion }}
+      {% if form.descripcion.errors %}
+        <small class="form-error">{{ form.descripcion.errors|join:", " }}</small>
+      {% endif %}
+    </div>
+
+    {# ── Price & Duration ─────────────────────────────────────────────── #}
+    <div class="form-field">
+      <label for="{{ form.precio.id_for_label }}">Price (USD) *</label>
+      {{ form.precio }}
+      {% if form.precio.errors %}
+        <small class="form-error">{{ form.precio.errors|join:", " }}</small>
+      {% endif %}
+    </div>
+
+    <div class="form-field">
+      <label for="{{ form.duracion_minutos.id_for_label }}">Reference duration (min)</label>
+      {{ form.duracion_minutos }}
+      <small class="form-hint">Just a placeholder. Real duration is set per worker.</small>
+    </div>
+
+    {# ── Display Order & Toggles ──────────────────────────────────────── #}
+    <div class="form-field">
+      <label for="{{ form.orden.id_for_label }}">Display order</label>
+      {{ form.orden }}
+      <small class="form-hint">Lower number = appears first.</small>
+    </div>
+
+    <div class="checkbox-group">
+      <label class="checkbox-label">
+        {{ form.activo }}
+        Active (visible on public site)
+      </label>
+      <label class="checkbox-label">
+        {{ form.destacado }}
+        ⭐ Featured (highlighted on landing)
+      </label>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">
+      {% if obj %}Save changes{% else %}Create service{% endif %}
+    </button>
+    <a href="{% url 'panel:servicio_list' %}" class="btn btn-ghost">Cancel</a>
+    {% if obj %}
+      <a href="{% url 'panel:servicio_delete' obj.pk %}" class="btn btn-danger">
+        Delete
+      </a>
+    {% endif %}
+  </div>
+</form>
+{% endblock %}

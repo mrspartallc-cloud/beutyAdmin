@@ -1,0 +1,631 @@
+{% load static %}<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#FFFAF7">
+  <title>Quick · {{ site.name }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      -webkit-tap-highlight-color: transparent; 
+    }
+    
+    html, body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #FFFAF7 0%, #FFF8F3 100%);
+      color: #2D2424;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    
+    body {
+      padding: env(safe-area-inset-top) 0 calc(96px + env(safe-area-inset-bottom)) 0;
+    }
+
+    /* ── Topbar ───────────────────────────────────── */
+    .qtop {
+      position: sticky; 
+      top: 0; 
+      z-index: 10;
+      background: linear-gradient(135deg, rgba(255, 250, 247, 0.95), rgba(255, 248, 243, 0.95));
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      padding: 16px 20px 14px;
+      border-bottom: 2px solid rgba(201, 169, 110, 0.15);
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      box-shadow: 0 2px 12px rgba(168, 136, 75, 0.06);
+    }
+    
+    .qtop-title { 
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem; 
+      font-weight: 700;
+      color: #2D2424;
+      letter-spacing: -0.3px;
+    }
+    
+    .qtop-title span { 
+      color: #A8884B; 
+      font-weight: 700; 
+    }
+    
+    .qtop-actions { 
+      display: flex; 
+      gap: 10px; 
+    }
+    
+    .qtop-btn {
+      width: 42px; 
+      height: 42px; 
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 251, 247, 0.9));
+      border: 1.5px solid rgba(201, 169, 110, 0.25);
+      display: grid; 
+      place-items: center;
+      color: #6B5B53; 
+      text-decoration: none; 
+      font-size: 1.15rem;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(168, 136, 75, 0.08);
+    }
+    
+    .qtop-btn:active { 
+      transform: scale(0.94); 
+    }
+
+    /* ── Day tabs ────────────────────────────────── */
+    .qtabs {
+      display: grid; 
+      grid-template-columns: 1fr 1fr;
+      gap: 10px; 
+      padding: 16px 20px 8px;
+    }
+    
+    .qtab {
+      padding: 14px; 
+      border-radius: 14px; 
+      text-align: center;
+      background: linear-gradient(135deg, #FFFFFF, #FFFBF7);
+      border: 1.5px solid rgba(201, 169, 110, 0.2);
+      text-decoration: none; 
+      color: #6B5B53;
+      font-size: 0.875rem; 
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 1px 4px rgba(168, 136, 75, 0.04);
+    }
+    
+    .qtab strong {
+      display: block; 
+      font-size: 1.5rem; 
+      font-weight: 700;
+      color: #2D2424; 
+      line-height: 1.1;
+      margin-top: 4px;
+    }
+    
+    .qtab.is-active {
+      border-color: #C9A96E;
+      border-width: 2px;
+      background: linear-gradient(135deg, #FFFBF7, #FFF8F0);
+      color: #A8884B;
+      box-shadow: 0 4px 14px rgba(168, 136, 75, 0.25);
+      transform: translateY(-2px);
+    }
+    
+    .qtab.is-active strong { 
+      color: #A8884B; 
+    }
+
+    /* ── Messages ─────────────────────────────────── */
+    .qmsg {
+      margin: 14px 20px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      animation: slidein 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      border-left: 4px solid;
+    }
+    
+    .qmsg.success { 
+      background: linear-gradient(135deg, #ECFDF5, #D1FAE5); 
+      color: #065f46; 
+      border-left-color: #10B981;
+    }
+    
+    .qmsg.warning { 
+      background: linear-gradient(135deg, #FFFBEB, #FEF3C7); 
+      color: #92400e; 
+      border-left-color: #F59E0B;
+    }
+    
+    .qmsg.error { 
+      background: linear-gradient(135deg, #FEF2F2, #FEE2E2); 
+      color: #991b1b; 
+      border-left-color: #EF4444;
+    }
+    
+    .qmsg button {
+      background: transparent; 
+      border: none; 
+      cursor: pointer;
+      font-size: 1.3rem; 
+      color: inherit; 
+      opacity: 0.6;
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+    }
+    
+    .qmsg button:hover {
+      opacity: 1;
+      background: rgba(0, 0, 0, 0.05);
+    }
+    
+    @keyframes slidein {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Appointment list ───────────────────────────── */
+    .qlist { 
+      padding: 10px 16px 0; 
+    }
+    
+    .qcita {
+      background: linear-gradient(135deg, #FFFFFF, #FFFBF7);
+      border-radius: 16px;
+      padding: 16px 18px;
+      margin-bottom: 12px;
+      display: grid;
+      grid-template-columns: 76px 1fr auto;
+      gap: 16px;
+      align-items: center;
+      border: 1.5px solid rgba(201, 169, 110, 0.2);
+      box-shadow: 0 2px 8px rgba(168, 136, 75, 0.06);
+      transition: all 0.3s ease;
+    }
+    
+    .qcita.is-next {
+      border-color: #C9A96E;
+      border-width: 2px;
+      background: linear-gradient(135deg, #FFFBF7, #FFF8F0);
+      box-shadow: 0 6px 20px rgba(168, 136, 75, 0.2);
+      transform: translateY(-2px);
+    }
+    
+    .qcita.is-done { 
+      opacity: 0.5; 
+    }
+    
+    .qcita.is-done .qcita-time strong { 
+      text-decoration: line-through; 
+    }
+
+    .qcita-time {
+      text-align: center;
+      padding: 10px 0;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(201, 169, 110, 0.15), rgba(168, 136, 75, 0.12));
+      border: 1px solid rgba(201, 169, 110, 0.2);
+    }
+    
+    .qcita.is-next .qcita-time {
+      background: linear-gradient(135deg, #C9A96E, #B8985D, #A8884B);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 3px 10px rgba(168, 136, 75, 0.3);
+    }
+    
+    .qcita-time strong {
+      display: block; 
+      font-size: 1.15rem; 
+      font-weight: 700; 
+      line-height: 1;
+    }
+    
+    .qcita-time small {
+      font-size: 0.65rem; 
+      opacity: 0.75;
+      text-transform: uppercase; 
+      letter-spacing: 1px;
+      font-weight: 600;
+      margin-top: 2px;
+      display: block;
+    }
+
+    .qcita-info { 
+      min-width: 0; 
+    }
+    
+    .qcita-name {
+      font-size: 1.05rem; 
+      font-weight: 700; 
+      line-height: 1.3;
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis;
+      color: #2D2424;
+    }
+    
+    .qcita-svc {
+      font-size: 0.825rem; 
+      color: #8B7355; 
+      margin-top: 4px;
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis;
+      font-weight: 500;
+    }
+    
+    .qcita-nick {
+      display: inline-block; 
+      margin-top: 6px;
+      font-size: 0.7rem; 
+      padding: 3px 10px; 
+      border-radius: 100px;
+      background: linear-gradient(135deg, rgba(201, 169, 110, 0.2), rgba(168, 136, 75, 0.15));
+      color: #A8884B; 
+      font-weight: 600;
+      border: 1px solid rgba(201, 169, 110, 0.25);
+    }
+    
+    .qcita-nick.is-empty { 
+      background: linear-gradient(135deg, #FEF3C7, #FDE68A); 
+      color: #92400e; 
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    .qcita-action {
+      display: flex; 
+      flex-direction: column; 
+      gap: 8px;
+    }
+    
+    .qbtn-mini {
+      width: 40px; 
+      height: 40px;
+      border: none; 
+      border-radius: 12px;
+      display: grid; 
+      place-items: center;
+      cursor: pointer; 
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+    
+    .qbtn-mini:active { 
+      transform: scale(0.9); 
+    }
+    
+    .qbtn-call {
+      background: linear-gradient(135deg, #ECFDF5, #D1FAE5);
+      color: #065f46;
+      text-decoration: none;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    
+    .qbtn-call:hover {
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
+    }
+    
+    .qbtn-done {
+      background: linear-gradient(135deg, #C9A96E, #B8985D, #A8884B);
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(168, 136, 75, 0.25);
+    }
+    
+    .qbtn-done:hover {
+      box-shadow: 0 4px 14px rgba(168, 136, 75, 0.35);
+    }
+
+    /* ── Empty state ─────────────────────────────── */
+    .qempty {
+      text-align: center; 
+      padding: 80px 28px;
+      color: #6B5B53;
+    }
+    
+    .qempty-icon { 
+      font-size: 4rem; 
+      margin-bottom: 16px; 
+      opacity: 0.25; 
+    }
+    
+    .qempty strong {
+      display: block;
+      font-size: 1.1rem;
+      color: #2D2424;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    
+    .qempty p { 
+      font-size: 0.95rem; 
+      margin-top: 8px;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    /* ── FAB (floating button) ────────────────────── */
+    .qfab {
+      position: fixed;
+      bottom: calc(20px + env(safe-area-inset-bottom));
+      right: 20px;
+      z-index: 20;
+      width: 64px; 
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #C9A96E 0%, #B8985D 50%, #A8884B 100%);
+      color: #fff;
+      border: none;
+      display: grid; 
+      place-items: center;
+      font-size: 2.2rem; 
+      font-weight: 300;
+      box-shadow: 
+        0 8px 24px rgba(168, 136, 75, 0.4),
+        0 2px 6px rgba(0, 0, 0, 0.1),
+        inset 0 2px 0 rgba(255, 255, 255, 0.3);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    
+    .qfab:active { 
+      transform: scale(0.94); 
+      box-shadow: 
+        0 6px 18px rgba(168, 136, 75, 0.45),
+        0 2px 6px rgba(0, 0, 0, 0.1),
+        inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    }
+    
+    .qfab-label {
+      position: absolute;
+      right: 76px; 
+      top: 50%; 
+      transform: translateY(-50%);
+      background: linear-gradient(135deg, #2D2424, #3D3434);
+      color: #fff;
+      padding: 10px 16px; 
+      border-radius: 100px;
+      font-size: 0.8rem; 
+      font-weight: 600;
+      white-space: nowrap;
+      opacity: 0; 
+      pointer-events: none;
+      animation: hint 4s ease-in-out 1s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      letter-spacing: 0.3px;
+    }
+    
+    @keyframes hint {
+      0%, 100% { 
+        opacity: 0; 
+        transform: translateY(-50%) translateX(10px); 
+      }
+      15%, 85% { 
+        opacity: 1; 
+        transform: translateY(-50%) translateX(0); 
+      }
+    }
+
+    /* ── Bottom nav ───────────────────────────────── */
+    .qnav {
+      position: fixed;
+      bottom: 0; 
+      left: 0; 
+      right: 0;
+      z-index: 15;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 251, 247, 0.98));
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-top: 2px solid rgba(201, 169, 110, 0.15);
+      padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+      display: grid; 
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      box-shadow: 0 -2px 12px rgba(168, 136, 75, 0.08);
+    }
+    
+    .qnav a {
+      display: flex; 
+      flex-direction: column; 
+      align-items: center;
+      gap: 3px; 
+      padding: 10px 8px;
+      text-decoration: none; 
+      color: #8B7355;
+      font-size: 0.68rem; 
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      transition: all 0.2s ease;
+    }
+    
+    .qnav a span { 
+      font-size: 1.3rem; 
+    }
+    
+    .qnav a.is-active { 
+      color: #A8884B; 
+    }
+    
+    .qnav a.is-active span {
+      transform: scale(1.05);
+    }
+    
+    .qnav a:active { 
+      transform: scale(0.94); 
+    }
+
+    /* ── Responsive Desktop ────────────────────────── */
+    @media (min-width: 768px) {
+      body {
+        max-width: 600px;
+        margin: 0 auto;
+        padding-top: calc(env(safe-area-inset-top) + 20px);
+      }
+      
+      .qtop {
+        border-radius: 16px;
+        margin: 0 20px;
+      }
+      
+      .qtabs {
+        padding: 16px 20px 8px;
+      }
+      
+      .qlist {
+        padding: 10px 20px 0;
+      }
+      
+      .qnav {
+        max-width: 600px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 20px 20px 0 0;
+      }
+      
+      .qfab {
+        right: calc(50% - 280px);
+      }
+    }
+
+    /* ── iPhone Safe Area ─────────────────────────── */
+    @supports (padding: max(0px)) {
+      body {
+        padding-left: max(0px, env(safe-area-inset-left));
+        padding-right: max(0px, env(safe-area-inset-right));
+      }
+    }
+  </style>
+</head>
+<body>
+
+  {# ── TOPBAR ────────────────────────────────────── #}
+  <header class="qtop">
+    <div class="qtop-title">
+      Appointments <span>{{ titulo|lower }}</span>
+    </div>
+    <div class="qtop-actions">
+      <a href="{% url 'panel:dashboard' %}" class="qtop-btn" title="Vista completa">⊞</a>
+      <form method="post" action="{% url 'panel:logout' %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="qtop-btn" title="Sign out"
+                style="background:linear-gradient(135deg, rgba(254,226,226,0.8), rgba(252,165,165,0.7));border-color:rgba(220,38,38,0.25);">⏻</button>
+      </form>
+    </div>
+  </header>
+
+  {# ── Tabs Today / Tomorrow ────────────────────────── #}
+  <div class="qtabs">
+    <a href="?d=hoy" class="qtab {% if cuando == 'hoy' %}is-active{% endif %}">
+      Today
+      <strong>{% if cuando == 'hoy' %}{{ n_citas }}{% else %}—{% endif %}</strong>
+    </a>
+    <a href="?d=manana" class="qtab {% if cuando == 'manana' %}is-active{% endif %}">
+      Tomorrow
+      <strong>{% if cuando == 'manana' %}{{ n_citas }}{% else %}—{% endif %}</strong>
+    </a>
+  </div>
+
+  {# ── Messages flash ────────────────────────────── #}
+  {% if messages %}
+    {% for m in messages %}
+      <div class="qmsg {{ m.tags }}">
+        <span>{{ m }}</span>
+        <button onclick="this.parentElement.remove()" aria-label="Close">×</button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {# ── Appointment list ──────────────────────────── #}
+  <main class="qlist">
+    {% if citas %}
+      {% for c in citas %}
+        <article class="qcita
+                        {% if c.pk == siguiente_pk %}is-next{% endif %}
+                        {% if c.estado == 'completada' %}is-done{% endif %}">
+          <div class="qcita-time">
+            <strong>{{ c.hora|time:"H:i" }}</strong>
+            <small>{{ c.hora|time:"a" }}</small>
+          </div>
+          <div class="qcita-info">
+            <div class="qcita-name">{{ c.nombre_cliente }}</div>
+            <div class="qcita-svc">{{ c.servicio.nombre }}</div>
+            {% if c.trabajadora %}
+              <span class="qcita-nick">@{{ c.trabajadora.nickname }}</span>
+            {% else %}
+              <span class="qcita-nick is-empty">⚠ Unassigned</span>
+            {% endif %}
+          </div>
+          <div class="qcita-action">
+            <a href="tel:{{ c.telefono }}" class="qbtn-mini qbtn-call" title="Call">📞</a>
+            {% if c.estado != 'completada' %}
+              <form method="post" action="{% url 'panel:quick_complete' c.pk %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="qbtn-mini qbtn-done" title="Completed">✓</button>
+              </form>
+            {% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    {% else %}
+      <div class="qempty">
+        <div class="qempty-icon">📅</div>
+        <strong>No appointments {{ titulo|lower }}</strong>
+        <p>Tap the <strong>+</strong> button to add one.</p>
+      </div>
+    {% endif %}
+  </main>
+
+  {# ── FAB New appointment ────────────────────────────── #}
+  <a href="{% url 'panel:quick_new' %}" class="qfab" aria-label="New appointment">
+    <span class="qfab-label">+ New appointment</span>
+    +
+  </a>
+
+  {# ── Bottom nav ────────────────────────────────── #}
+  <nav class="qnav">
+    <a href="{% url 'panel:quick_calendar' %}">
+      <span>📅</span>Calendar
+    </a>
+    <a href="{% url 'panel:quick_home' %}" class="is-active">
+      <span>📋</span>Today
+    </a>
+    <a href="{% url 'panel:quick_new' %}">
+      <span>➕</span>New
+    </a>
+    <a href="{% url 'panel:dashboard' %}">
+      <span>⊞</span>More
+    </a>
+  </nav>
+
+  {# Auto-cerrar mensajes flash a los 4s #}
+  <script>
+    setTimeout(() => {
+      document.querySelectorAll('.qmsg').forEach(el => {
+        el.style.transition = 'opacity 0.3s';
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 300);
+      });
+    }, 4000);
+  </script>
+</body>
+</html>

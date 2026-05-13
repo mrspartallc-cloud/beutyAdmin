@@ -1,0 +1,104 @@
+{% extends 'panel/base_panel.html' %}
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">{{ titulo }}</h1>
+    <p class="page-subtitle">
+      {% if obj %}
+        Update this image's details or replace it with another.
+      {% else %}
+        Upload a finished work image to display it on the public gallery.
+      {% endif %}
+    </p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'panel:galeria_list' %}" class="btn btn-ghost btn-sm">← Back</a>
+  </div>
+</div>
+
+{% if messages %}
+  {% for m in messages %}
+    <div class="alert alert-{{ m.tags }}">{{ m }}</div>
+  {% endfor %}
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" class="card" style="padding:24px;">
+  {% csrf_token %}
+
+  {# Current image preview #}
+  {% if obj and obj.imagen %}
+    <div style="margin-bottom:24px;text-align:center;padding:16px;background:var(--color-cream, #FFF7EE);border-radius:12px;">
+      <p style="margin:0 0 10px;font-size:0.78rem;letter-spacing:1px;text-transform:uppercase;color:var(--color-text-muted);">
+       Current image
+      </p>
+      <img src="{{ obj.imagen.url }}" alt="{{ obj.descripcion|default:obj.titulo }}"
+           style="max-width:280px;max-height:280px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+    </div>
+  {% endif %}
+
+  {# ── Campos del form ───────────────────────────────────────── #}
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+    <div class="form-field" style="grid-column:1/-1;">
+      <label for="{{ form.imagen.id_for_label }}">{{ form.imagen.label }}</label>
+      {{ form.imagen }}
+      {% if form.imagen.help_text %}
+        <small style="color:var(--color-text-muted);font-size:0.78rem;">
+          {{ form.imagen.help_text }}
+        </small>
+      {% endif %}
+      {% if form.imagen.errors %}
+        <small style="color:#dc2626;">{{ form.imagen.errors|join:", " }}</small>
+      {% endif %}
+    </div>
+
+    <div class="form-field" style="grid-column:1/-1;">
+      <label for="{{ form.titulo.id_for_label }}">{{ form.titulo.label }}</label>
+      {{ form.titulo }}
+      {% if form.titulo.errors %}
+        <small style="color:#dc2626;">{{ form.titulo.errors|join:", " }}</small>
+      {% endif %}
+    </div>
+
+    <div class="form-field" style="grid-column:1/-1;">
+      <label for="{{ form.descripcion.id_for_label }}">{{ form.descripcion.label }}</label>
+      {{ form.descripcion }}
+      <small style="color:var(--color-text-muted);font-size:0.78rem;">
+        Helps SEO and screen readers — short alt text.
+      </small>
+      {% if form.descripcion.errors %}
+        <small style="color:#dc2626;">{{ form.descripcion.errors|join:", " }}</small>
+      {% endif %}
+    </div>
+
+    <div class="form-field">
+      <label for="{{ form.orden.id_for_label }}">{{ form.orden.label }}</label>
+      {{ form.orden }}
+    </div>
+
+    <div class="form-field" style="display:flex;flex-direction:column;gap:10px;justify-content:flex-end;">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:500;">
+        {{ form.activa }}
+        {{ form.activa.label }}
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:500;">
+        {{ form.destacada }}
+        {{ form.destacada.label }}
+      </label>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:12px;margin-top:24px;padding-top:18px;border-top:1px dashed rgba(201,169,110,0.25);">
+    <button type="submit" class="btn btn-primary">
+      {% if obj %}Save changes{% else %}Upload image{% endif %}
+    </button>
+    <a href="{% url 'panel:galeria_list' %}" class="btn btn-ghost">Cancel</a>
+    {% if obj %}
+      <a href="{% url 'panel:galeria_delete' obj.pk %}" class="btn btn-danger" style="margin-left:auto;">
+        Delete
+      </a>
+    {% endif %}
+  </div>
+</form>
+{% endblock %}

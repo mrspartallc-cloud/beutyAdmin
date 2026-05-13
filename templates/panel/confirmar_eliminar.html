@@ -1,0 +1,29 @@
+{% extends 'panel/base_panel.html' %}
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow">Confirm action</p>
+    <h1 class="page-title">{{ titulo }}</h1>
+  </div>
+</div>
+
+<div class="card" style="max-width:520px;">
+  <p>You are about to delete <strong>{{ obj }}</strong>.</p>
+  {% if advertencia %}
+    <div class="form-alert">{{ advertencia }}</div>
+  {% endif %}
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-actions">
+      {% if url_cancelar_arg %}
+        <a href="{% url url_cancelar url_cancelar_arg %}" class="btn btn-ghost">Cancel</a>
+      {% else %}
+        <a href="{% url url_cancelar %}" class="btn btn-ghost">Cancel</a>
+      {% endif %}
+      <button type="submit" class="btn btn-danger">Yes, delete</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

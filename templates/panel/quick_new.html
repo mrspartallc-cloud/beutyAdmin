@@ -1,0 +1,810 @@
+{% load static %}<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#FFFAF7">
+  <title>+ Appointment · {{ site.name }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      -webkit-tap-highlight-color: transparent; 
+    }
+    
+    html, body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(180deg, #FFFAF7 0%, #FFF8F3 100%);
+      color: #2D2424;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    
+    body {
+      padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
+    }
+
+    /* ── Topbar ───────────────────────────────────── */
+    .qtop {
+      position: sticky; 
+      top: 0; 
+      z-index: 10;
+      background: linear-gradient(135deg, rgba(255, 250, 247, 0.95), rgba(255, 248, 243, 0.95));
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      padding: 16px 20px;
+      border-bottom: 2px solid rgba(201, 169, 110, 0.15);
+      display: flex; 
+      align-items: center; 
+      gap: 14px;
+      box-shadow: 0 2px 12px rgba(168, 136, 75, 0.06);
+    }
+    
+    .qtop a.back {
+      width: 44px; 
+      height: 44px; 
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 251, 247, 0.9));
+      border: 1.5px solid rgba(201, 169, 110, 0.25);
+      display: grid; 
+      place-items: center;
+      color: #6B5B53; 
+      text-decoration: none; 
+      font-size: 1.3rem;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(168, 136, 75, 0.08);
+    }
+    
+    .qtop a.back:active { 
+      transform: scale(0.94); 
+    }
+    
+    .qtop h1 { 
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem; 
+      font-weight: 700;
+      color: #2D2424;
+      letter-spacing: -0.3px;
+    }
+
+    /* ── Pasos (Progress Steps) ────────────────────── */
+    .qsteps {
+      display: flex; 
+      gap: 8px;
+      padding: 16px 20px;
+    }
+    
+    .qstep {
+      flex: 1;
+      height: 5px;
+      background: linear-gradient(135deg, rgba(201, 169, 110, 0.15), rgba(168, 136, 75, 0.12));
+      border-radius: 100px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .qstep.is-done { 
+      background: linear-gradient(90deg, #C9A96E, #B8985D, #A8884B);
+      box-shadow: 0 2px 8px rgba(168, 136, 75, 0.25);
+    }
+
+    /* ── Messages ─────────────────────────────────── */
+    .qmsg {
+      margin: 14px 20px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      border-left: 4px solid;
+    }
+    
+    .qmsg.error { 
+      background: linear-gradient(135deg, #FEF2F2, #FEE2E2); 
+      color: #991b1b; 
+      border-left-color: #EF4444;
+    }
+
+    /* ── Form ─────────────────────────────────────── */
+    form { 
+      padding: 10px 20px 24px; 
+    }
+
+    .qfield {
+      margin-bottom: 24px;
+    }
+    
+    .qfield label {
+      display: block;
+      font-size: 0.75rem; 
+      font-weight: 700;
+      letter-spacing: 1.4px; 
+      text-transform: uppercase;
+      color: #A8884B;
+      margin-bottom: 10px;
+    }
+    
+    .qinput, .qselect {
+      width: 100%;
+      padding: 15px 18px;
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #FFFFFF, #FFFBF7);
+      border: 1.5px solid rgba(201, 169, 110, 0.25);
+      border-radius: 12px;
+      color: #2D2424;
+      -webkit-appearance: none; 
+      appearance: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 1px 4px rgba(168, 136, 75, 0.04);
+    }
+    
+    .qinput:focus, .qselect:focus {
+      outline: none;
+      border-color: #C9A96E;
+      box-shadow: 0 0 0 4px rgba(201, 169, 110, 0.12), 0 2px 8px rgba(168, 136, 75, 0.08);
+      background: #FFFBF7;
+    }
+    
+    .qinput::placeholder {
+      color: #A8998A;
+    }
+    
+    .qselect {
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23A8884B'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 24px;
+      padding-right: 48px;
+      cursor: pointer;
+    }
+
+    /* Service chips (visual selection) */
+    .qchips {
+      display: flex; 
+      flex-wrap: wrap; 
+      gap: 10px;
+    }
+    
+    .qchip {
+      padding: 13px 18px;
+      background: linear-gradient(135deg, #FFFFFF, #FFFBF7);
+      border: 1.5px solid rgba(201, 169, 110, 0.25);
+      border-radius: 100px;
+      cursor: pointer;
+      font-size: 0.9rem; 
+      font-weight: 600;
+      color: #2D2424;
+      display: flex; 
+      align-items: center; 
+      gap: 8px;
+      transition: all 0.3s ease;
+      box-shadow: 0 1px 4px rgba(168, 136, 75, 0.04);
+    }
+    
+    .qchip:active { 
+      transform: scale(0.96); 
+    }
+    
+    .qchip.is-selected {
+      background: linear-gradient(135deg, #C9A96E, #B8985D, #A8884B);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(168, 136, 75, 0.3);
+      transform: scale(1.02);
+    }
+    
+    .qchip-icon { 
+      font-size: 1.1rem; 
+    }
+
+    /* Technicians with avatars */
+    .qtrabs {
+      display: flex; 
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory;
+    }
+    
+    .qtrabs::-webkit-scrollbar {
+      height: 6px;
+    }
+    
+    .qtrabs::-webkit-scrollbar-track {
+      background: rgba(201, 169, 110, 0.08);
+      border-radius: 10px;
+    }
+    
+    .qtrabs::-webkit-scrollbar-thumb {
+      background: rgba(201, 169, 110, 0.3);
+      border-radius: 10px;
+    }
+    
+    .qtrab {
+      flex-shrink: 0;
+      width: 80px;
+      padding: 12px 8px;
+      background: linear-gradient(135deg, #FFFFFF, #FFFBF7);
+      border: 1.5px solid rgba(201, 169, 110, 0.2);
+      border-radius: 14px;
+      cursor: pointer;
+      text-align: center;
+      scroll-snap-align: start;
+      transition: all 0.3s ease;
+      box-shadow: 0 1px 4px rgba(168, 136, 75, 0.04);
+    }
+    
+    .qtrab:active { 
+      transform: scale(0.96); 
+    }
+    
+    .qtrab.is-selected {
+      border-color: #C9A96E;
+      border-width: 2px;
+      background: linear-gradient(135deg, #FFFBF7, #FFF8F0);
+      box-shadow: 0 4px 12px rgba(168, 136, 75, 0.2);
+      transform: translateY(-2px);
+    }
+    
+    .qtrab-avatar {
+      width: 48px; 
+      height: 48px;
+      border-radius: 50%;
+      margin: 0 auto 8px;
+      background: linear-gradient(135deg, #C9A96E, #B8985D, #A8884B);
+      color: #fff;
+      display: grid; 
+      place-items: center;
+      font-weight: 700; 
+      font-size: 1.2rem;
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(168, 136, 75, 0.2);
+    }
+    
+    .qtrab-avatar img { 
+      width: 100%; 
+      height: 100%; 
+      object-fit: cover; 
+    }
+    
+    .qtrab-auto .qtrab-avatar {
+      background: linear-gradient(135deg, #F0EBE3, #E5DFD7);
+      font-size: 1.3rem;
+    }
+    
+    .qtrab-name {
+      font-size: 0.72rem; 
+      font-weight: 600;
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis;
+      color: #6B5B53;
+    }
+    
+    .qtrab.is-selected .qtrab-name { 
+      color: #A8884B; 
+      font-weight: 700;
+    }
+
+    /* Time slots (grid) */
+    .qslots {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    
+    .qslot {
+      padding: 16px 8px;
+      background: linear-gradient(135deg, #FFFFFF, #FFFBF7);
+      border: 1.5px solid rgba(201, 169, 110, 0.25);
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1rem; 
+      font-weight: 700;
+      color: #2D2424;
+      text-align: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 1px 4px rgba(168, 136, 75, 0.04);
+    }
+    
+    .qslot:active { 
+      transform: scale(0.96); 
+    }
+    
+    .qslot.is-selected {
+      background: linear-gradient(135deg, #C9A96E, #B8985D, #A8884B);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(168, 136, 75, 0.3);
+      transform: scale(1.02);
+    }
+    
+    .qslot-suggested::after {
+      content: "✨"; 
+      position: absolute;
+      margin-left: 5px; 
+      font-size: 0.75rem;
+    }
+    
+    .qslots-empty {
+      grid-column: 1 / -1;
+      padding: 24px; 
+      text-align: center;
+      color: #6B5B53; 
+      font-size: 0.875rem;
+      font-weight: 500;
+      background: linear-gradient(135deg, rgba(201, 169, 110, 0.08), rgba(168, 136, 75, 0.05));
+      border-radius: 12px;
+      border: 1.5px dashed rgba(201, 169, 110, 0.25);
+    }
+
+    /* Inline today/tomorrow toggle */
+    .qdaytoggle {
+      display: grid; 
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px; 
+      margin-bottom: 12px;
+    }
+    
+    .qdaybtn {
+      padding: 12px 8px;
+      background: linear-gradient(135deg, #FFFFFF, #FFFBF7);
+      border: 1.5px solid rgba(201, 169, 110, 0.25);
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.875rem; 
+      font-weight: 600;
+      color: #6B5B53;
+      text-align: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 1px 4px rgba(168, 136, 75, 0.04);
+    }
+    
+    .qdaybtn:active { 
+      transform: scale(0.96); 
+    }
+    
+    .qdaybtn.is-selected {
+      background: linear-gradient(135deg, #C9A96E, #B8985D, #A8884B);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(168, 136, 75, 0.3);
+    }
+    
+    .qdaybtn small { 
+      display: block; 
+      font-size: 0.68rem; 
+      opacity: 0.9; 
+      margin-top: 3px; 
+      font-weight: 500;
+    }
+
+    /* ── Submit fixed ─────────────────────────────── */
+    .qsubmit-wrap {
+      position: sticky;
+      bottom: 0;
+      background: linear-gradient(180deg, rgba(255, 250, 247, 0), rgba(255, 250, 247, 0.8) 20%, #FFFAF7 40%);
+      padding: 20px 20px calc(24px + env(safe-area-inset-bottom));
+      margin-top: 12px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    
+    .qsubmit {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #C9A96E 0%, #B8985D 50%, #A8884B 100%);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 1.05rem; 
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 
+        0 8px 24px rgba(168, 136, 75, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      transition: all 0.3s ease;
+      letter-spacing: 0.3px;
+    }
+    
+    .qsubmit:active { 
+      transform: scale(0.98); 
+    }
+    
+    .qsubmit:disabled {
+      opacity: 0.5; 
+      cursor: not-allowed;
+      box-shadow: none;
+      background: linear-gradient(135deg, #D4C4B0, #C4B4A0);
+    }
+
+    .qhint {
+      font-size: 0.8rem; 
+      color: #8B7355;
+      margin-top: 8px;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    /* ── Responsive ────────────────────────────────── */
+    @media (min-width: 768px) {
+      body {
+        max-width: 600px;
+        margin: 0 auto;
+        padding-top: calc(env(safe-area-inset-top) + 20px);
+      }
+      
+      .qtop {
+        border-radius: 16px;
+        margin: 0 20px;
+      }
+      
+      .qslots {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    /* ── iPhone Safe Area ─────────────────────────── */
+    @supports (padding: max(0px)) {
+      body {
+        padding-left: max(0px, env(safe-area-inset-left));
+        padding-right: max(0px, env(safe-area-inset-right));
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="qtop">
+    <a href="{% url 'panel:quick_home' %}" class="back">←</a>
+    <h1>New Appointment</h1>
+  </header>
+
+  <div class="qsteps">
+    <div class="qstep" id="step1"></div>
+    <div class="qstep" id="step2"></div>
+    <div class="qstep" id="step3"></div>
+  </div>
+
+  {% if messages %}
+    {% for m in messages %}
+      <div class="qmsg {{ m.tags }}">{{ m }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" id="qform" novalidate>
+    {% csrf_token %}
+
+    {# ── 1. Client ──────────────────────────────── #}
+    <div class="qfield">
+      <label>1 · Client</label>
+      <input type="text" name="nombre" id="i-nombre" class="qinput"
+             list="clientesPrev" placeholder="Client name"
+             autocomplete="off" autocapitalize="words" required>
+      <datalist id="clientesPrev">
+        {% for nombre in clientes_recientes %}
+          <option value="{{ nombre }}">
+        {% endfor %}
+      </datalist>
+    </div>
+
+    <div class="qfield">
+      <label>Phone <span style="color:#9B8B83;text-transform:none;letter-spacing:0;font-weight:400;font-size:0.7rem;">(optional)</span></label>
+      <input type="tel" name="telefono" id="i-telefono" class="qinput"
+             placeholder="(555) 123-4567 — optional"
+             inputmode="tel" autocomplete="tel">
+    </div>
+
+    {# ── 2. Service (chips) ─────────────────────── #}
+    <div class="qfield">
+      <label>2 · Service</label>
+      <div class="qchips" id="chipsService">
+        {% for s in servicios %}
+          <button type="button" class="qchip" data-id="{{ s.pk }}">
+            <span class="qchip-icon">{{ s.icono|default:"💅" }}</span>
+            {{ s.nombre }}
+          </button>
+        {% endfor %}
+      </div>
+      <input type="hidden" name="servicio" id="i-servicio" required>
+    </div>
+
+    {# ── Technician ─────────────────────────────── #}
+    <div class="qfield">
+      <label>Technician</label>
+      <div class="qtrabs" id="trabsList">
+        <button type="button" class="qtrab qtrab-auto is-selected" data-id="auto">
+          <div class="qtrab-avatar">✨</div>
+          <div class="qtrab-name">Auto</div>
+        </button>
+        {% for t in trabajadoras %}
+          <button type="button" class="qtrab" data-id="{{ t.pk }}">
+            <div class="qtrab-avatar">
+              {% if t.foto %}
+                <img src="{{ t.foto.url }}" alt="">
+              {% else %}
+                {{ t.nickname|first|upper }}
+              {% endif %}
+            </div>
+            <div class="qtrab-name">@{{ t.nickname }}</div>
+          </button>
+        {% endfor %}
+      </div>
+      <input type="hidden" name="trabajadora" id="i-trabajadora" value="auto">
+      <p class="qhint">✨ Auto = the system assigns the least busy technician.</p>
+    </div>
+
+    {# ── 3. Day + Time ───────────────────────────── #}
+    <div class="qfield">
+      <label>3 · Day</label>
+      <div class="qdaytoggle" id="daytoggle">
+        {# Buttons are generated dynamically by JS #}
+      </div>
+      <input type="hidden" name="fecha" id="i-fecha" value="{{ hoy_iso }}">
+    </div>
+
+    <div class="qfield">
+      <label>Time <small id="slotsLbl" style="opacity:0.6;text-transform:none;letter-spacing:0;font-weight:400;"></small></label>
+      <div class="qslots" id="slotsGrid">
+        <div class="qslots-empty">Loading…</div>
+      </div>
+      <input type="hidden" name="hora" id="i-hora">
+    </div>
+
+    {# ── Notes optionales ─────────────────────────── #}
+    <div class="qfield">
+      <label>Notes (optional)</label>
+      <input type="text" name="notas" class="qinput" placeholder="Design, allergies…">
+    </div>
+
+    <div class="qsubmit-wrap">
+      <button type="submit" class="qsubmit" id="qsubmit" disabled>
+        Create Appointment
+      </button>
+    </div>
+  </form>
+
+  <script>
+    const SLOTS_URL = "{% url 'panel:quick_slots_json' %}";
+    const HOY_ISO = "{{ hoy_iso }}";
+    const HORA_PREFILL = "{{ hora_sugerida_str }}";
+    const FECHA_PREFILL = "{{ fecha_sugerida_iso }}";
+    const SERVICIO_WORKERS = {{ servicio_workers_json|safe }};
+
+    function actualizarChipsServices() {
+      // If the trabajadora es Auto, mostramos todos los servicios.
+      // If specific worker, show only services she offers.
+      const chips = document.querySelectorAll('#chipsService .qchip');
+      chips.forEach(chip => {
+        const sid = chip.dataset.id;
+        const workers = SERVICIO_WORKERS[sid] || [];
+        let visible = true;
+        if (state.trabajadora && state.trabajadora !== 'auto') {
+          visible = workers.includes(parseInt(state.trabajadora, 10));
+        }
+        chip.style.display = visible ? '' : 'none';
+        if (!visible && state.servicio === sid) {
+          // El servicio elegido no longer aplica → deseleccionar
+          chip.classList.remove('is-selected');
+          state.servicio = null;
+          document.getElementById('i-servicio').value = '';
+          updateSteps();
+        }
+      });
+    }
+
+    // ── Status del form ───────────────────────────
+    const state = {
+      nombre: false,
+      // phone is no longer required
+      servicio: null,
+      trabajadora: 'auto',
+      fecha: FECHA_PREFILL || HOY_ISO,
+      hora: null,
+    };
+    // Sincronizar el input oculto con la fecha inicial.
+    document.getElementById('i-fecha').value = state.fecha;
+
+    // ── Helpers ───────────────────────────────────
+    const DIAS_SEMANA = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const MESES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    function parseISO(iso) {
+      const [y, m, d] = iso.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    }
+    function fmtISO(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${dd}`;
+    }
+    function diaLabel(d) {
+      const hoy = parseISO(HOY_ISO);
+      hoy.setHours(0,0,0,0);
+      const target = new Date(d);
+      target.setHours(0,0,0,0);
+      const diff = Math.round((target - hoy) / 86400000);
+      if (diff === 0) return 'Today';
+      if (diff === 1) return 'Tomorrow';
+      return DIAS_SEMANA[(d.getDay() + 6) % 7];
+    }
+    function fechaLabel(d) {
+      return `${String(d.getDate()).padStart(2,'0')} ${MESES[d.getMonth()]}`;
+    }
+
+    function updateSteps() {
+      document.getElementById('step1').classList.toggle('is-done', state.nombre);
+      document.getElementById('step2').classList.toggle('is-done', !!state.servicio);
+      document.getElementById('step3').classList.toggle('is-done', !!state.hora);
+      document.getElementById('qsubmit').disabled = !(
+        state.nombre && state.servicio && state.hora
+      );
+    }
+
+    /* ── Build the 3 day buttons ────────────────────────
+       Logic:
+       - Si vino FECHA_PREFILL del calendario, usar esa como centro.
+         Buttons: [prefill date] [next day] [day +2]
+       - If no prefill arrived, use Today/Tomorrow/+2 days (classic behavior).
+    */
+    function buildDayButtons() {
+      const container = document.getElementById('daytoggle');
+      container.innerHTML = '';
+
+      const hoy = parseISO(HOY_ISO);
+      let fechaInicial;
+
+      if (FECHA_PREFILL && FECHA_PREFILL !== HOY_ISO) {
+        fechaInicial = parseISO(FECHA_PREFILL);
+      } else {
+        fechaInicial = new Date(hoy);
+      }
+
+      const fechas = [];
+      for (let i = 0; i < 3; i++) {
+        const d = new Date(fechaInicial);
+        d.setDate(d.getDate() + i);
+        fechas.push(d);
+      }
+
+      fechas.forEach((d, idx) => {
+        const iso = fmtISO(d);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'qdaybtn';
+        btn.dataset.iso = iso;
+        btn.innerHTML = `${diaLabel(d)}<small>${fechaLabel(d)}</small>`;
+        // The first button (prefill date or Today) is selected by default.
+        if (iso === state.fecha) {
+          btn.classList.add('is-selected');
+        }
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#daytoggle .qdaybtn').forEach(b => b.classList.remove('is-selected'));
+          btn.classList.add('is-selected');
+          state.fecha = iso;
+          document.getElementById('i-fecha').value = iso;
+          loadSlots();
+        });
+        container.appendChild(btn);
+      });
+
+      // If the prefill date didn't get selected for some reason,
+      // selecciona la primera.
+      const algunaActive = container.querySelector('.qdaybtn.is-selected');
+      if (!algunaActive && container.firstChild) {
+        container.firstChild.classList.add('is-selected');
+        state.fecha = container.firstChild.dataset.iso;
+        document.getElementById('i-fecha').value = state.fecha;
+      }
+    }
+
+    // ── Inputs cliente ────────────────────────────
+    document.getElementById('i-nombre').addEventListener('input', e => {
+      state.nombre = e.target.value.trim().length >= 2;
+      updateSteps();
+    });
+
+    // ── Chips servicio ───────────────────────────
+    document.querySelectorAll('#chipsService .qchip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('#chipsService .qchip').forEach(c => c.classList.remove('is-selected'));
+        chip.classList.add('is-selected');
+        state.servicio = chip.dataset.id;
+        document.getElementById('i-servicio').value = chip.dataset.id;
+        updateSteps();
+        loadSlots();  // recalcular slots con duración del servicio
+      });
+    });
+
+    // ── Technician ──────────────────────────────
+    document.querySelectorAll('#trabsList .qtrab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#trabsList .qtrab').forEach(b => b.classList.remove('is-selected'));
+        btn.classList.add('is-selected');
+        state.trabajadora = btn.dataset.id;
+        document.getElementById('i-trabajadora').value = btn.dataset.id;
+        actualizarChipsServices();
+        loadSlots();
+      });
+    });
+
+    // ── Construir botones de día (dinámicos) ─────
+    buildDayButtons();
+    // Filter servicios al estado inicial
+    actualizarChipsServices();
+
+    // ── Cargar slots ─────────────────────────────
+    function loadSlots() {
+      const grid = document.getElementById('slotsGrid');
+      const lbl = document.getElementById('slotsLbl');
+      grid.innerHTML = '<div class="qslots-empty">Loading…</div>';
+      state.hora = null;
+      document.getElementById('i-hora').value = '';
+      updateSteps();
+
+      let url = `${SLOTS_URL}?fecha=${state.fecha}&trabajadora=${state.trabajadora}`;
+      if (state.servicio) {
+        url += `&servicio=${state.servicio}`;
+      }
+      // Slot pre-seleccionado del calendario (sólo en la fecha original)
+      if (HORA_PREFILL && state.fecha === FECHA_PREFILL) {
+        url += `&forzar=${encodeURIComponent(HORA_PREFILL)}`;
+      }
+      fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(r => r.json())
+        .then(data => {
+          const slots = data.slots || [];
+          if (!slots.length) {
+            grid.innerHTML = '<div class="qslots-empty">⚠ No available times today.</div>';
+            lbl.textContent = '';
+            return;
+          }
+          lbl.textContent = `· ${slots.length} libre${slots.length>1?'s':''}`;
+          grid.innerHTML = '';
+          slots.forEach((hhmm, idx) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'qslot';
+            btn.textContent = hhmm;
+            btn.addEventListener('click', () => {
+              document.querySelectorAll('.qslot').forEach(s => s.classList.remove('is-selected'));
+              btn.classList.add('is-selected');
+              state.hora = hhmm;
+              document.getElementById('i-hora').value = hhmm;
+              updateSteps();
+            });
+            grid.appendChild(btn);
+          });
+          if (slots.length > 0) {
+            let target = grid.children[0];
+            if (HORA_PREFILL && state.fecha === FECHA_PREFILL) {
+              const match = Array.from(grid.children).find(b => b.textContent === HORA_PREFILL);
+              if (match) target = match;
+            }
+            target.click();
+          }
+        })
+        .catch(() => {
+          grid.innerHTML = '<div class="qslots-empty">Error al cargar horarios.</div>';
+        });
+    }
+
+    // ── Init ─────────────────────────────────────
+    loadSlots();
+    updateSteps();
+
+    // Pre-seleccionar primer servicio si hay only uno o dos
+    const chips = document.querySelectorAll('#chipsService .qchip');
+    if (chips.length === 1) {
+      chips[0].click();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+{% extends 'panel/base_panel.html' %}
+{% block title %}Services{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">💅 Services</h1>
+    <p class="page-subtitle">
+      Services your salon offers. The real duration of each appointment is set
+      per worker in <em>"Services per worker"</em>.
+    </p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'panel:servicio_create' %}" class="btn btn-primary">+ New service</a>
+  </div>
+</div>
+
+{% if total %}
+  <div class="stats-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;">
+    <div class="card" style="padding:16px;text-align:center;">
+      <div style="font-size:1.8rem;font-weight:700;color:var(--color-gold-dark);">{{ total }}</div>
+      <div style="font-size:0.78rem;letter-spacing:1px;text-transform:uppercase;color:var(--color-text-muted);">Total</div>
+    </div>
+    <div class="card" style="padding:16px;text-align:center;">
+      <div style="font-size:1.8rem;font-weight:700;color:#22c55e;">{{ activos }}</div>
+      <div style="font-size:0.78rem;letter-spacing:1px;text-transform:uppercase;color:var(--color-text-muted);">Active</div>
+    </div>
+    <div class="card" style="padding:16px;text-align:center;">
+      <div style="font-size:1.8rem;font-weight:700;color:#C9A96E;">{{ destacados }}</div>
+      <div style="font-size:0.78rem;letter-spacing:1px;text-transform:uppercase;color:var(--color-text-muted);">⭐ Featured</div>
+    </div>
+  </div>
+{% endif %}
+
+{% if messages %}
+  {% for m in messages %}
+    <div class="alert alert-{{ m.tags }}">{{ m }}</div>
+  {% endfor %}
+{% endif %}
+
+{% if servicios %}
+  <div class="card" style="overflow-x:auto;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width:40px;">Order</th>
+          <th>Service</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Workers</th>
+          <th style="width:1%;">Status</th>
+          <th style="width:1%;text-align:right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in servicios %}
+        {% with s=row.obj %}
+          <tr {% if not s.activo %}style="opacity:0.55;"{% endif %}>
+            <td><span class="orden-pill">#{{ s.orden }}</span></td>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="font-size:1.4rem;">{{ s.icono|default:"💅" }}</span>
+                <div>
+                  <strong>{{ s.nombre }}</strong>
+                  {% if s.destacado %}
+                    <span class="badge badge-gold">⭐ Featured</span>
+                  {% endif %}
+                  {% if s.descripcion %}
+                    <br><small style="color:var(--color-text-muted);">{{ s.descripcion|truncatewords:12 }}</small>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+            <td>{{ s.get_categoria_display }}</td>
+            <td><strong>${{ s.precio|floatformat:2 }}</strong></td>
+            <td>
+              {% if row.num_trabajadoras > 0 %}
+                <span style="color:var(--color-gold-dark);font-weight:600;">
+                  {{ row.num_trabajadoras }} 👥
+                </span>
+              {% else %}
+                <span style="color:#92400e;font-size:0.85rem;">⚠ none yet</span>
+              {% endif %}
+            </td>
+            <td>
+              <form method="post" action="{% url 'panel:servicio_toggle' s.pk %}">
+                {% csrf_token %}
+                <button type="submit"
+                        class="badge {% if s.activo %}badge-success{% else %}badge-warning{% endif %}"
+                        style="border:none;cursor:pointer;font-family:inherit;">
+                  {% if s.activo %}✓ Active{% else %}⏸ Paused{% endif %}
+                </button>
+              </form>
+            </td>
+            <td style="text-align:right;white-space:nowrap;">
+              <form method="post" action="{% url 'panel:servicio_destacar' s.pk %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn-icon {% if s.destacado %}is-active{% endif %}"
+                        title="{% if s.destacado %}Remove from featured{% else %}Mark as featured{% endif %}">⭐</button>
+              </form>
+              <a href="{% url 'panel:servicio_update' s.pk %}" class="btn-icon" title="Edit">✏️</a>
+              <a href="{% url 'panel:servicio_delete' s.pk %}" class="btn-icon btn-icon-danger" title="Delete">🗑</a>
+            </td>
+          </tr>
+        {% endwith %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="empty-state" style="padding:60px 24px;text-align:center;">
+    <div style="font-size:3rem;margin-bottom:12px;opacity:0.3;">💅</div>
+    <h3 style="margin:0 0 6px;">No services yet</h3>
+    <p style="color:var(--color-text-muted);margin:0 0 18px;">
+      Create your first service so workers can offer it.
+    </p>
+    <a href="{% url 'panel:servicio_create' %}" class="btn btn-primary">+ Create first service</a>
+  </div>
+{% endif %}
+
+<style>
+  .orden-pill {
+    background: rgba(45,36,36,0.08);
+    padding: 3px 8px;
+    border-radius: 100px;
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: var(--color-text-muted, #6B5B53);
+  }
+  .badge-gold {
+    background: linear-gradient(135deg, #C9A96E, #A8884B);
+    color: #fff;
+    font-size: 0.62rem !important;
+    margin-left: 6px;
+  }
+</style>
+{% endblock %}

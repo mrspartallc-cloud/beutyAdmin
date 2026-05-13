@@ -1,0 +1,83 @@
+{% extends 'panel/base_panel.html' %}
+{% block title %}Assign technician{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow">Appointments</p>
+    <h1 class="page-title">Assign technician</h1>
+    <p class="page-sub">
+      Appointment for <strong>{{ cita.nombre_cliente }}</strong> ·
+      {{ cita.fecha|date:"l, F j" }} at {{ cita.hora|time:"H:i" }} ·
+      {{ cita.servicio.nombre }}
+    </p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'panel:citas_admin' %}" class="btn btn-ghost btn-sm">← Back</a>
+  </div>
+</div>
+
+<div class="card">
+  {% if candidatas %}
+    <div class="card-head">
+      <h2 style="margin:0;">Available technicians at that time</h2>
+      <span class="pill pill-ok">{{ candidatas|length }} disponible(s)</span>
+    </div>
+    <form method="post" style="padding:20px;">
+      {% csrf_token %}
+      <div class="workers-grid" style="margin-top:0;">
+        {% for t in candidatas %}
+          <label class="worker-card" style="cursor:pointer;display:block;">
+            <input type="radio" name="trabajadora_id" value="{{ t.pk }}"
+                   required style="margin-bottom:8px;">
+            <div class="worker-avatar">
+              {% if t.foto %}
+                <img src="{{ t.foto.url }}" alt="">
+              {% else %}
+                <span>{{ t.nickname|first|upper }}</span>
+              {% endif %}
+            </div>
+            <h3 class="worker-nick">@{{ t.nickname }}</h3>
+            <p class="worker-bio">{{ t.nombre_completo }}</p>
+          </label>
+        {% endfor %}
+      </div>
+      <div class="form-actions">
+        <a href="{% url 'panel:citas_admin' %}" class="btn btn-ghost">Cancel</a>
+        <button type="submit" class="btn btn-primary">Assign</button>
+      </div>
+    </form>
+  {% else %}
+    <div class="empty-state">
+      <p>⚠ No technician is available at that time.</p>
+      <p>Consider changing the appointment date/time, or cancelling it.</p>
+    </div>
+  {% endif %}
+</div>
+
+{% if todas %}
+<details style="margin-top:24px;">
+  <summary style="cursor:pointer;color:var(--color-text-muted);padding:12px;">
+    Force assignment to another technician (even if outside their schedule)
+  </summary>
+  <form method="post" class="card" style="margin-top:12px;">
+    {% csrf_token %}
+    <p style="color:var(--color-text-muted);font-size:0.9rem;">
+      ⚠ This may create conflicts. Use only if you know what you're doing.
+    </p>
+    <div class="form-field">
+      <label>Technician</label>
+      <select name="trabajadora_id" class="form-control" required>
+        <option value="">Select…</option>
+        {% for t in todas %}
+          <option value="{{ t.pk }}">@{{ t.nickname }} — {{ t.nombre_completo }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-danger btn-sm">Force assignment</button>
+    </div>
+  </form>
+</details>
+{% endif %}
+{% endblock %}

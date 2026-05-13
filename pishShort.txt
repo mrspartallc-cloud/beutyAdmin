@@ -1,0 +1,23 @@
+🌸 Sistema de Gestión para Nail Spa — Listo para EE.UU.
+
+Deja de perder dinero por errores manuales. 
+Este sistema te da control, privacidad y flujo de caja claro.
+
+🔑 LO QUE OBTIENES:
+• 🚫 Cero citas duplicadas — calendario inteligente con detección de colisiones
+• 🔒 Privacidad nativa — clientas solo ven nickname del personal
+• 👩‍💼 Roles separados — admin ve finanzas; trabajadoras solo su agenda
+• 💵 Control financiero — gráfico de ganancias por trabajadora + comisiones
+• 📱 100% responsive — funciona en cualquier móvil sin instalar app
+• 🌐 Landing pública — servicios, galería y reserva online 24/7
+
+⚠️ TRANSPARENCIA:
+• Requiere hosting básico (~$/mes en Render/Railway)
+
+
+🚀 PRÓXIMAMENTE:
+• Confirmación de citas por llamada/email
+• Botón flotante de WhatsApp
+• Personalización visual 100% a tu marca
+• SMS/Email automáticos se configuran con servicios externos (Twilio/SMTP)
+• Pagos con tarjeta (Stripe/Square) requieren integración adicional

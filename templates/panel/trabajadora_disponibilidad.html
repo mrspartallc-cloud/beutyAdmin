@@ -1,0 +1,92 @@
+{% extends 'panel/base_panel.html' %}
+{% block title %}Availability · @{{ worker.nickname }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow">Team / Availability</p>
+    <h1 class="page-title">⏰{{ worker.nickname }}'s schedule management</h1>
+    <p class="page-sub">{{ worker.nombre_completo }}</p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'panel:trabajadoras_list' %}" class="btn btn-ghost btn-sm">← Back</a>
+    <a href="{% url 'panel:trabajadora_update' worker.pk %}" class="btn btn-ghost btn-sm">Edit perfil</a>
+  </div>
+</div>
+
+<div class="dispo-grid">
+  {# ── Form para agregar bloque ──────────────────────── #}
+  <aside class="card card-narrow" style="margin:0;">
+    <h2 style="margin-top:0;">Add bloque</h2>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="form-field">
+        <label for="{{ form.dia_semana.id_for_label }}">{{ form.dia_semana.label }}</label>
+        {{ form.dia_semana }}
+        {% if form.dia_semana.errors %}<small class="form-error">{{ form.dia_semana.errors|join:" " }}</small>{% endif %}
+      </div>
+      <div class="form-row">
+        <div class="form-field">
+          <label for="{{ form.hora_inicio.id_for_label }}">Home</label>
+          {{ form.hora_inicio }}
+          {% if form.hora_inicio.errors %}<small class="form-error">{{ form.hora_inicio.errors|join:" " }}</small>{% endif %}
+        </div>
+        <div class="form-field">
+          <label for="{{ form.hora_fin.id_for_label }}">Fin</label>
+          {{ form.hora_fin }}
+          {% if form.hora_fin.errors %}<small class="form-error">{{ form.hora_fin.errors|join:" " }}</small>{% endif %}
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm btn-block">Add</button>
+      <p class="form-hint" style="text-align:center;margin-top:12px;">
+        Slots are generated every 60 minutes within each block.
+      </p>
+    </form>
+  </aside>
+
+  {# ── List de bloques actuales ─────────────────────── #}
+  <div>
+    <div class="card">
+      <div class="card-head">
+        <h2 style="margin:0;">Active blocks</h2>
+      </div>
+
+      {% if horarios %}
+        <div class="dispo-list">
+          {% regroup horarios by get_dia_semana_display as por_dia %}
+          {% for grupo in por_dia %}
+            <div class="dispo-day">
+              <h3>{{ grupo.grouper }}</h3>
+              <div class="dispo-blocks">
+                {% for h in grupo.list %}
+                  <div class="dispo-block {% if not h.activo %}is-inactive{% endif %}">
+                    <span class="dispo-time">
+                      {{ h.hora_inicio|time:"H:i" }} – {{ h.hora_fin|time:"H:i" }}
+                    </span>
+                    <div class="dispo-actions">
+                      <form method="post" action="{% url 'panel:horario_toggle' h.pk %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="link-edit" title="Activer/desactivar">
+                          {% if h.activo %}⏸ Pause{% else %}▶ Activate{% endif %}
+                        </button>
+                      </form>
+                      <a href="{% url 'panel:horario_eliminar' h.pk %}" class="link-danger">
+                        Delete
+                      </a>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <p>No availability blocks.
+             @{{ worker.nickname }} to appear on the public site.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

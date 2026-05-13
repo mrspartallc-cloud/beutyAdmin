@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Appointment — Serenity Spa & Nails</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#EC4899',
+            secondary: '#F9A8D4',
+            cta: '#8B5CF6',
+            brand: { bg: '#FDF2F8', text: '#831843' }
+          },
+          fontFamily: { heading: ['Lora','serif'], body: ['Raleway','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Raleway', sans-serif; }
+    h1,h2,h3,h4 { font-family: 'Lora', serif; }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    .step-panel { display: none; }
+    .step-panel.active { display: block; }
+    input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
+    .time-slot { cursor: pointer; }
+    .time-slot.selected { background-color: #EC4899; color: white; border-color: #EC4899; }
+    .service-card.selected { border-color: #EC4899; background-color: #FDF2F8; }
+    .service-card.selected .service-check { display: flex; }
+  </style>
+</head>
+<body class="bg-brand-bg min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="fixed top-4 left-4 right-4 z-50 bg-white/80 backdrop-blur-md rounded-2xl shadow-md px-6 py-3 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2 cursor-pointer">
+      <span class="font-heading text-base font-semibold text-brand-text">Serenity</span>
+      <span class="font-heading text-base font-semibold text-primary">Spa & Nails</span>
+    </a>
+    <a href="index.html" class="text-sm text-brand-text/60 hover:text-primary transition-colors duration-200 cursor-pointer flex items-center gap-1.5">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+      Back to Home
+    </a>
+  </nav>
+
+  <div class="max-w-5xl mx-auto px-4 pt-28 pb-16 flex flex-col lg:flex-row gap-8">
+
+    <!-- Form Area -->
+    <div class="flex-1">
+      <h1 class="text-3xl font-bold text-brand-text mb-2">Book Your Appointment</h1>
+      <p class="text-brand-text/60 mb-8">Complete the steps below to reserve your spot.</p>
+
+      <!-- Progress Steps -->
+      <div class="flex items-center gap-2 mb-10">
+        <div class="flex items-center gap-2" id="step-indicator-1">
+          <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-semibold step-circle-1">1</div>
+          <span class="text-sm font-semibold text-primary hidden sm:block">Service</span>
+        </div>
+        <div class="flex-1 h-px bg-secondary/60 mx-1"></div>
+        <div class="flex items-center gap-2" id="step-indicator-2">
+          <div class="w-8 h-8 rounded-full bg-secondary/40 text-brand-text/50 flex items-center justify-center text-sm font-semibold step-circle-2">2</div>
+          <span class="text-sm font-medium text-brand-text/50 hidden sm:block">Date & Time</span>
+        </div>
+        <div class="flex-1 h-px bg-secondary/60 mx-1"></div>
+        <div class="flex items-center gap-2" id="step-indicator-3">
+          <div class="w-8 h-8 rounded-full bg-secondary/40 text-brand-text/50 flex items-center justify-center text-sm font-semibold step-circle-3">3</div>
+          <span class="text-sm font-medium text-brand-text/50 hidden sm:block">Your Info</span>
+        </div>
+      </div>
+
+      <!-- Step 1: Service -->
+      <div class="step-panel active" id="panel-1">
+        <h2 class="text-xl font-bold text-brand-text mb-5">Choose a Service</h2>
+        <div class="grid sm:grid-cols-2 gap-4 mb-8">
+          <div class="service-card bg-white border-2 border-secondary/30 rounded-2xl p-5 cursor-pointer hover:border-primary/50 transition-colors duration-200 relative" onclick="selectService(this, 'Manicure & Pedicure', '$25')">
+            <div class="service-check hidden absolute top-3 right-3 w-6 h-6 bg-primary rounded-full items-center justify-center">
+              <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+            </div>
+            <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center mb-3">
+              <svg class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
+            </div>
+            <h3 class="font-semibold text-brand-text mb-1">Manicure & Pedicure</h3>
+            <p class="text-xs text-brand-text/60 mb-3">Classic nail shaping, cuticle care, and polish.</p>
+            <div class="flex items-center justify-between">
+              <span class="text-primary font-semibold text-sm">From $25</span>
+              <span class="text-xs text-brand-text/50">60 min</span>
+            </div>
+          </div>
+          <div class="service-card bg-white border-2 border-secondary/30 rounded-2xl p-5 cursor-pointer hover:border-primary/50 transition-colors duration-200 relative" onclick="selectService(this, 'Gel & Acrylic Nails', '$45')">
+            <div class="service-check hidden absolute top-3 right-3 w-6 h-6 bg-primary rounded-full items-center justify-center">
+              <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+            </div>
+            <div class="w-10 h-10 bg-cta/10 rounded-xl flex items-center justify-center mb-3">
+              <svg class="w-5 h-5 text-cta" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z"/></svg>
+            </div>
+            <h3 class="font-semibold text-brand-text mb-1">Gel & Acrylic Nails</h3>
+            <p class="text-xs text-brand-text/60 mb-3">Long-lasting extensions and overlays.</p>
+            <div class="flex items-center justify-between">
+              <span class="text-cta font-semibold text-sm">From $45</span>
+              <span class="text-xs text-brand-text/50">90 min</span>
+            </div>
+          </div>
+          <div class="service-card bg-white border-2 border-secondary/30 rounded-2xl p-5 cursor-pointer hover:border-primary/50 transition-colors duration-200 relative" onclick="selectService(this, 'Nail Art & Design', '$35')">
+            <div class="service-check hidden absolute top-3 right-3 w-6 h-6 bg-primary rounded-full items-center justify-center">
+              <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+            </div>
+            <div class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center mb-3">
+              <svg class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/></svg>
+            </div>
+            <h3 class="font-semibold text-brand-text mb-1">Nail Art & Design</h3>
+            <p class="text-xs text-brand-text/60 mb-3">Custom designs, gems, and creative styles.</p>
+            <div class="flex items-center justify-between">
+              <span class="text-primary font-semibold text-sm">From $35</span>
+              <span class="text-xs text-brand-text/50">75 min</span>
+            </div>
+          </div>
+          <div class="service-card bg-white border-2 border-secondary/30 rounded-2xl p-5 cursor-pointer hover:border-primary/50 transition-colors duration-200 relative" onclick="selectService(this, 'Spa Treatment', '$55')">
+            <div class="service-check hidden absolute top-3 right-3 w-6 h-6 bg-primary rounded-full items-center justify-center">
+              <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+            </div>
+            <div class="w-10 h-10 bg-cta/10 rounded-xl flex items-center justify-center mb-3">
+              <svg class="w-5 h-5 text-cta" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/></svg>
+            </div>
+            <h3 class="font-semibold text-brand-text mb-1">Spa Treatment</h3>
+            <p class="text-xs text-brand-text/60 mb-3">Relaxing aromatherapy hand & foot spa.</p>
+            <div class="flex items-center justify-between">
+              <span class="text-cta font-semibold text-sm">From $55</span>
+              <span class="text-xs text-brand-text/50">90 min</span>
+            </div>
+          </div>
+        </div>
+        <button onclick="goToStep(2)" class="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3.5 rounded-xl transition-colors duration-200 cursor-pointer disabled:opacity-50" id="btn-step1">
+          Continue to Date & Time
+        </button>
+      </div>
+
+      <!-- Step 2: Date & Time -->
+      <div class="step-panel" id="panel-2">
+        <h2 class="text-xl font-bold text-brand-text mb-5">Pick a Date & Time</h2>
+        <div class="bg-white rounded-2xl border border-secondary/20 p-6 mb-6">
+          <label for="appt-date" class="block text-sm font-semibold text-brand-text mb-2">Select Date</label>
+          <input type="date" id="appt-date" class="w-full border border-secondary/40 rounded-xl px-4 py-3 text-sm text-brand-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary cursor-pointer" min="2026-05-08" />
+        </div>
+        <div class="bg-white rounded-2xl border border-secondary/20 p-6 mb-8">
+          <p class="text-sm font-semibold text-brand-text mb-4">Available Time Slots</p>
+          <div class="grid grid-cols-3 sm:grid-cols-4 gap-2" id="time-slots">
+            <button class="time-slot border border-secondary/40 text-brand-text/70 text-sm py-2.5 rounded-xl hover:border-primary/50 hover:text-primary transition-colors duration-200" onclick="selectTime(this)">9:00 AM</button>
+            <button class="time-slot border border-secondary/40 text-brand-text/70 text-sm py-2.5 rounded-xl hover:border-primary/50 hover:text-primary transition-colors duration-200" onclick="selectTime(this)">9:30 AM</button>
+            <button class="time-slot border border-secondary/40 text-brand-text/70 text-sm py-2.5 rounded-xl hover:border-primary/50 hover:text-primary transition-colors duration-200" onclick="selectTime(this)">10:00 AM</button>
+            <button class="time-slot border border-secondary/40 text-brand-text/70 text-sm py-2.5 rounded-xl hover:border-primary/50 hover:text-primary transition-colors duration-200" onclick="selectTime(this)">10:30 AM</button>
+            <button class="time-slot border border-secondary/40 text-brand-text/70 text-sm py-2.5 rounded-xl hover:border-primary/50 hover:text-primary transition-colors duration-200" onclick="selectTime(this)">11:00 AM</button>
+            <button class="time-slot border border-secondary/40 text-brand-text/70 text-sm py-2.5 rounded-xl hover:border-primary/50 hover:text-primary transition-colors duration-200" onclick="selectTime(this)">11:30 AM</button>
+            <button class="time-slot border border-secondary/40 text-brand-text/70 text-sm py-2.5 rounded-xl hover:border-primary/50 hover:text-primary transition-colors duration-200 opacity-40 pointer-events-none">1:00 PM</button>
+            <button class="time-slot border border-secondary/40 text-brand-text/70 text-sm py-2.5 rounded-xl hover:border-primary/50 hover:text-primary transition-colors duration-200" onclick="selectTime(this)">1:30 PM</button>
+            <button class="time-slot border border-secondary/40 text-brand-text/70 text-sm py-2.5 rounded-xl hover:border-primary/50 hover:text-primary transition-colors duration-200" onclick="selectTime(this)">2:00 PM</button>
+            <button class="time-slot border border-secondary/40 text-brand-text/70 text-sm py-2.5 rounded-xl hover:border-primary/50 hover:text-primary transition-colors duration-200" onclick="selectTime(this)">2:30 PM</button>
+            <button class="time-slot border border-secondary/40 text-brand-text/70 text-sm py-2.5 rounded-xl hover:border-primary/50 hover:text-primary transition-colors duration-200 opacity-40 pointer-events-none">3:00 PM</button>
+            <button class="time-slot border border-secondary/40 text-brand-text/70 text-sm py-2.5 rounded-xl hover:border-primary/50 hover:text-primary transition-colors duration-200" onclick="selectTime(this)">3:30 PM</button>
+          </div>
+          <p class="text-xs text-brand-text/40 mt-3">Greyed slots are already booked.</p>
+        </div>
+        <div class="flex gap-3">
+          <button onclick="goToStep(1)" class="flex-1 border border-secondary/40 hover:border-primary/40 text-brand-text/70 hover:text-primary font-semibold py-3.5 rounded-xl transition-colors duration-200 cursor-pointer">Back</button>
+          <button onclick="goToStep(3)" class="flex-1 bg-primary hover:bg-primary/90 text-white font-semibold py-3.5 rounded-xl transition-colors duration-200 cursor-pointer">Continue</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Personal Info -->
+      <div class="step-panel" id="panel-3">
+        <h2 class="text-xl font-bold text-brand-text mb-5">Your Information</h2>
+        <form onsubmit="submitBooking(event)" class="space-y-5">
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div>
+              <label for="first-name" class="block text-sm font-semibold text-brand-text mb-2">First Name</label>
+              <input type="text" id="first-name" required placeholder="Jane" class="w-full border border-secondary/40 rounded-xl px-4 py-3 text-sm text-brand-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+            </div>
+            <div>
+              <label for="last-name" class="block text-sm font-semibold text-brand-text mb-2">Last Name</label>
+              <input type="text" id="last-name" required placeholder="Doe" class="w-full border border-secondary/40 rounded-xl px-4 py-3 text-sm text-brand-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+            </div>
+          </div>
+          <div>
+            <label for="email" class="block text-sm font-semibold text-brand-text mb-2">Email Address</label>
+            <input type="email" id="email" required placeholder="jane@example.com" class="w-full border border-secondary/40 rounded-xl px-4 py-3 text-sm text-brand-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+          </div>
+          <div>
+            <label for="phone" class="block text-sm font-semibold text-brand-text mb-2">Phone Number</label>
+            <input type="tel" id="phone" required placeholder="+1 (555) 000-0000" class="w-full border border-secondary/40 rounded-xl px-4 py-3 text-sm text-brand-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
+          </div>
+          <div>
+            <label for="technician" class="block text-sm font-semibold text-brand-text mb-2">Preferred Technician <span class="text-brand-text/40 font-normal">(optional)</span></label>
+            <select id="technician" class="w-full border border-secondary/40 rounded-xl px-4 py-3 text-sm text-brand-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary cursor-pointer bg-white">
+              <option value="">No preference</option>
+              <option value="lily">Lily</option>
+              <option value="rose">Rose</option>
+            </select>
+          </div>
+          <div>
+            <label for="notes" class="block text-sm font-semibold text-brand-text mb-2">Special Requests <span class="text-brand-text/40 font-normal">(optional)</span></label>
+            <textarea id="notes" rows="3" placeholder="Any allergies, design references, or requests..." class="w-full border border-secondary/40 rounded-xl px-4 py-3 text-sm text-brand-text focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none"></textarea>
+          </div>
+          <div class="flex gap-3 pt-2">
+            <button type="button" onclick="goToStep(2)" class="flex-1 border border-secondary/40 hover:border-primary/40 text-brand-text/70 hover:text-primary font-semibold py-3.5 rounded-xl transition-colors duration-200 cursor-pointer">Back</button>
+            <button type="submit" id="submit-btn" class="flex-1 bg-primary hover:bg-primary/90 text-white font-semibold py-3.5 rounded-xl transition-colors duration-200 cursor-pointer">
+              Confirm Booking
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Success State -->
+      <div class="step-panel text-center py-12" id="panel-success">
+        <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-5">
+          <svg class="w-8 h-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+        </div>
+        <h2 class="text-2xl font-bold text-brand-text mb-3">Booking Confirmed!</h2>
+        <p class="text-brand-text/60 mb-2">Thank you! We'll send a confirmation to your email.</p>
+        <p class="text-sm text-brand-text/50 mb-8">We look forward to seeing you at Serenity Spa & Nails.</p>
+        <a href="index.html" class="inline-block bg-primary hover:bg-primary/90 text-white font-semibold px-8 py-3.5 rounded-xl transition-colors duration-200 cursor-pointer">Back to Home</a>
+      </div>
+    </div>
+
+    <!-- Booking Summary Sidebar -->
+    <aside class="lg:w-72">
+      <div class="bg-white rounded-2xl border border-secondary/20 shadow-sm p-6 sticky top-28">
+        <h3 class="font-heading text-base font-bold text-brand-text mb-5">Booking Summary</h3>
+        <div class="space-y-4">
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/></svg>
+            </div>
+            <div>
+              <p class="text-xs text-brand-text/50 mb-0.5">Service</p>
+              <p class="text-sm font-semibold text-brand-text" id="summary-service">Not selected</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 bg-cta/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-4 h-4 text-cta" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
+            </div>
+            <div>
+              <p class="text-xs text-brand-text/50 mb-0.5">Date</p>
+              <p class="text-sm font-semibold text-brand-text" id="summary-date">Not selected</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg class="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div>
+              <p class="text-xs text-brand-text/50 mb-0.5">Time</p>
+              <p class="text-sm font-semibold text-brand-text" id="summary-time">Not selected</p>
+            </div>
+          </div>
+          <div class="border-t border-secondary/20 pt-4 flex items-center justify-between">
+            <p class="text-sm font-semibold text-brand-text">Starting from</p>
+            <p class="text-lg font-bold text-primary" id="summary-price">—</p>
+          </div>
+        </div>
+        <div class="mt-5 p-3 bg-brand-bg rounded-xl">
+          <p class="text-xs text-brand-text/60 leading-relaxed">Free cancellations up to 24 hours before your appointment.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    let currentStep = 1;
+    const selectedData = { service: '', price: '', date: '', time: '' };
+
+    function goToStep(step) {
+      document.getElementById('panel-' + currentStep).classList.remove('active');
+      document.getElementById('panel-' + step).classList.add('active');
+
+      for (let i = 1; i <= 3; i++) {
+        const circle = document.querySelector('.step-circle-' + i);
+        if (i < step) {
+          circle.parentElement.parentElement.querySelector('span') && (circle.parentElement.parentElement.querySelector('span').className = 'text-sm font-semibold text-green-600 hidden sm:block');
+          circle.className = circle.className.replace('bg-secondary/40 text-brand-text/50', '').replace('bg-primary text-white', '') + ' bg-green-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold step-circle-' + i;
+          circle.innerHTML = '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>';
+        } else if (i === step) {
+          circle.className = 'w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-semibold step-circle-' + i;
+          circle.innerHTML = i;
+        } else {
+          circle.className = 'w-8 h-8 rounded-full bg-secondary/40 text-brand-text/50 flex items-center justify-center text-sm font-semibold step-circle-' + i;
+          circle.innerHTML = i;
+        }
+      }
+      currentStep = step;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function selectService(card, name, price) {
+      document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedData.service = name;
+      selectedData.price = price;
+      document.getElementById('summary-service').textContent = name;
+      document.getElementById('summary-price').textContent = price;
+    }
+
+    function selectTime(btn) {
+      document.querySelectorAll('.time-slot').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedData.time = btn.textContent.trim();
+      document.getElementById('summary-time').textContent = selectedData.time;
+    }
+
+    document.getElementById('appt-date').addEventListener('change', function() {
+      const d = new Date(this.value + 'T00:00:00');
+      selectedData.date = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+      document.getElementById('summary-date').textContent = selectedData.date;
+    });
+
+    function submitBooking(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Confirming...';
+      setTimeout(() => {
+        document.getElementById('panel-3').classList.remove('active');
+        document.getElementById('panel-success').classList.add('active');
+      }, 1200);
+    }
+  </script>
+</body>
+</html>

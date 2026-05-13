@@ -1,0 +1,232 @@
+{% extends 'panel/base_panel.html' %}
+{% block title %}Gallery · Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">📸 Gallery</h1>
+    <p class="page-subtitle">
+      Images shown in the "Our latest work" section of the website.
+      <br>
+      <small style="color:var(--color-text-muted);">
+        💡 Active images show on the public site. Paused images stay
+        saved but hidden. You can reorder to feature your favorites first.
+      </small>
+    </p>
+  </div>
+  <div class="page-actions">
+    <a href="{% url 'panel:galeria_create' %}" class="btn btn-primary">
+      + Upload image
+    </a>
+  </div>
+</div>
+
+{# ── Stats ─────────────────────────────────────────────────────── #}
+{% if total %}
+  <div class="stats-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;">
+    <div class="card" style="padding:16px;text-align:center;">
+      <div style="font-size:1.8rem;font-weight:700;color:var(--color-gold-dark);">{{ total }}</div>
+      <div style="font-size:0.78rem;letter-spacing:1px;text-transform:uppercase;color:var(--color-text-muted);">Total</div>
+    </div>
+    <div class="card" style="padding:16px;text-align:center;">
+      <div style="font-size:1.8rem;font-weight:700;color:#22c55e;">{{ activas_count }}</div>
+      <div style="font-size:0.78rem;letter-spacing:1px;text-transform:uppercase;color:var(--color-text-muted);">Actives</div>
+    </div>
+    <div class="card" style="padding:16px;text-align:center;">
+      <div style="font-size:1.8rem;font-weight:700;color:#C9A96E;">{{ destacadas_count }}</div>
+      <div style="font-size:0.78rem;letter-spacing:1px;text-transform:uppercase;color:var(--color-text-muted);">⭐ Featured</div>
+    </div>
+  </div>
+{% endif %}
+
+{% if messages %}
+  <div class="messages">
+    {% for m in messages %}
+      <div class="alert alert-{{ m.tags }}">{{ m }}</div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{# ── Grid de images ────────────────────────────────────────── #}
+{% if imagenes %}
+  <div class="galeria-admin-grid">
+    {% for img in imagenes %}
+      <div class="galeria-admin-card {% if not img.activa %}is-inactive{% endif %} {% if img.destacada %}is-featured{% endif %}">
+        <div class="galeria-admin-thumb">
+          <img src="{{ img.imagen.url }}" alt="{{ img.descripcion|default:img.titulo }}">
+          {% if img.destacada %}
+            <span class="galeria-badge galeria-badge-star">⭐</span>
+          {% endif %}
+          {% if not img.activa %}
+            <span class="galeria-badge galeria-badge-paused">Paused</span>
+          {% endif %}
+          <span class="galeria-orden-pill">#{{ img.orden }}</span>
+        </div>
+
+        <div class="galeria-admin-info">
+          <div class="galeria-admin-title">
+            {{ img.titulo|default:"(untitled)" }}
+          </div>
+          {% if img.descripcion %}
+            <p class="galeria-admin-desc">{{ img.descripcion|truncatewords:10 }}</p>
+          {% endif %}
+
+          {# Quick actions #}
+          <div class="galeria-admin-actions">
+            <form method="post" action="{% url 'panel:galeria_reordenar' img.pk 'subir' %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn-icon" title="Move up" aria-label="Move up">↑</button>
+            </form>
+            <form method="post" action="{% url 'panel:galeria_reordenar' img.pk 'bajar' %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn-icon" title="Move down" aria-label="Move down">↓</button>
+            </form>
+            <form method="post" action="{% url 'panel:galeria_destacar' img.pk %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn-icon {% if img.destacada %}is-active{% endif %}"
+                      title="{% if img.destacada %}Unfeature{% else %}Feature{% endif %}">⭐</button>
+            </form>
+            <form method="post" action="{% url 'panel:galeria_toggle' img.pk %}" style="display:inline;">
+              {% csrf_token %}
+              <button type="submit" class="btn-icon {% if img.activa %}is-active{% endif %}"
+                      title="{% if img.activa %}Pause{% else %}Activate{% endif %}">
+                {% if img.activa %}👁{% else %}🚫{% endif %}
+              </button>
+            </form>
+            <a href="{% url 'panel:galeria_update' img.pk %}" class="btn-icon" title="Edit">✏️</a>
+            <a href="{% url 'panel:galeria_delete' img.pk %}" class="btn-icon btn-icon-danger" title="Delete">🗑</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state" style="padding:60px 24px;text-align:center;">
+    <div style="font-size:3rem;margin-bottom:12px;opacity:0.3;">📸</div>
+    <h3 style="margin:0 0 6px;">No images in the gallery</h3>
+    <p style="color:var(--color-text-muted);margin:0 0 18px;">
+      Upload your first work so it appears on the public site.
+    </p>
+    <a href="{% url 'panel:galeria_create' %}" class="btn btn-primary">+ Upload your first image</a>
+  </div>
+{% endif %}
+
+<style>
+  .galeria-admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .galeria-admin-card {
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    border: 1.5px solid transparent;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .galeria-admin-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px -6px rgba(168, 136, 75, 0.25);
+  }
+  .galeria-admin-card.is-featured {
+    border-color: rgba(201, 169, 110, 0.5);
+  }
+  .galeria-admin-card.is-inactive {
+    opacity: 0.55;
+  }
+  .galeria-admin-thumb {
+    position: relative;
+    aspect-ratio: 1;
+    background: #F8E8DC;
+    overflow: hidden;
+  }
+  .galeria-admin-thumb img {
+    width: 100%; height: 100%; object-fit: cover;
+    display: block;
+  }
+  .galeria-badge {
+    position: absolute;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    backdrop-filter: blur(8px);
+    background: rgba(255,255,255,0.85);
+  }
+  .galeria-badge-star {
+    top: 8px; left: 8px;
+    color: #C9A96E;
+  }
+  .galeria-badge-paused {
+    top: 8px; right: 8px;
+    background: rgba(220, 38, 38, 0.92);
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+  }
+  .galeria-orden-pill {
+    position: absolute;
+    bottom: 8px; left: 8px;
+    background: rgba(45, 36, 36, 0.75);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 100px;
+    font-size: 0.7rem;
+    font-family: monospace;
+  }
+  .galeria-admin-info {
+    padding: 12px 14px 14px;
+  }
+  .galeria-admin-title {
+    font-weight: 600;
+    font-size: 0.92rem;
+    margin-bottom: 4px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .galeria-admin-desc {
+    font-size: 0.78rem;
+    color: var(--color-text-muted, #6B5B53);
+    margin: 0 0 10px;
+    line-height: 1.35;
+  }
+  .galeria-admin-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    border-top: 1px dashed rgba(201,169,110,0.2);
+    padding-top: 10px;
+  }
+  .btn-icon {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    border: 1px solid rgba(201,169,110,0.2);
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: inline-grid;
+    place-items: center;
+    text-decoration: none;
+    color: var(--color-text, #2D2424);
+    transition: all 0.15s;
+  }
+  .btn-icon:hover {
+    background: var(--color-cream, #FFF7EE);
+    transform: scale(1.05);
+  }
+  .btn-icon:active { transform: scale(0.92); }
+  .btn-icon.is-active {
+    background: linear-gradient(135deg, #C9A96E, #A8884B);
+    color: #fff;
+    border-color: transparent;
+  }
+  .btn-icon-danger:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+  }
+</style>
+{% endblock %}

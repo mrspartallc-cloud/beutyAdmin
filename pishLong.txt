@@ -1,0 +1,53 @@
+Dejas de perder dinero por citas duplicadas, 
+peleas por turnos y cuentas manuales.
+Este sistema te da control total,
+privacidad para tus clientas y
+flujo de caja claro,
+listo para operar en EE.UU.
+
+
+
+Clave:
+* Cero overbooking: El calendario detecta y bloquea solapamientos en tiempo real.
+* Privacidad nativa: Clientas solo ven nickname, nunca nombres reales ni datos sensibles.
+* Roles separados: Admin ve métricas/finanzas; trabajadoras solo su agenda y citas asignadas.
+* Control financiero claro: Registro automático de montos, comisiones y ganancia neta del salón preciso por trabajadora (grafico).
+* 100% responsive: Funciona en iPhone, Samsung y desktop sin app nativa.
+
+Ganancia:
+* Pesencia digital el la red.
+* Landing pública** con servicios, galería, equipo y CTA a reserva
+* Ahorra tiempo = Dinero.
+* Agenda digital centralizada y segura. (Publico a cualquier hora. )
+* No sabes cuánto ganaste realmente al mes.
+* Registro exacto de Ingresos y Comisiones.
+* Se evita "quién atendió a quién".
+* Asignación clara de servicios y horarios.
+* Clientas esperando porque hubo un error de cita.
+* Control de flujo integrado .
+* Se evita Pagos de nómina calculo manual.
+* impresion de reporte  
+
+Sistema le ahorra:
+• 5 horas/mes de administración ($75-150 valorados a $15-30/hora)
+• 1-2 citas perdidas por mes ($80-200 de ingreso perdido)
+• Errores en comisiones ($50-300 de conflicto evitado)
+
+️ 
+CONTRAS (Lo que debes saber antes):
+* Requiere hosting básico: No es SaaS; necesitas un servidor (Railway, Render, VPS ~$/mes/anual).
+* SMS/Email automáticos: Dependen de servicios externos (Twilio, SMTP) que se configuran aparte.
+* Pagos online no incluidos: Stripe/Square se integran con desarrollo adicional (el sistema registra ingresos, no procesa tarjetas).
+
+
+
+Por implementar:
+* Respiuesta de cita accptadas por telefono o emaiil 
+    (aqui se puede incluir 2 mensajes simultaneos al confirmal la cita,
+    un mensaje para el cliente y un mensaje para la trabajadora  )
+
+* Boton whawhatsapp /(faciL)
+ 
+Personalizacion: 
+* Aspetco visuales
+* Requerimiento del cliente 
