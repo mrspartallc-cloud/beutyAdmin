@@ -119,6 +119,7 @@
 .form-field input[type="email"],
 .form-field input[type="tel"],
 .form-field input[type="number"],
+.form-field input[type="password"],
 .form-field input[type="file"],
 .form-field textarea,
 .form-field select {
@@ -242,6 +243,25 @@
   color: #991B1B;
   font-weight: 600;
   margin-bottom: 24px;
+}
+
+/* ─── Password Security Warning ────────────────────────────────────────── */
+.password-warning {
+  padding: 12px 16px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1.5px solid rgba(245, 158, 11, 0.3);
+  border-radius: 8px;
+  color: #92400E;
+  font-size: 0.85rem;
+  margin-top: 8px;
+  display: flex;
+  align-items: start;
+  gap: 8px;
+}
+
+.password-warning::before {
+  content: "🔐";
+  flex-shrink: 0;
 }
 
 /* ─── Form Actions ──────────────────────────────────────────────────────── */
@@ -394,6 +414,23 @@
       <small class="form-hint">% the salon retains from each service.</small>
       {% if form.porcentaje.errors %}<small class="form-error">{{ form.porcentaje.errors|join:" " }}</small>{% endif %}
     </div>
+  </div>
+
+  <h3 class="form-section-title">🔐 Worker Portal Access</h3>
+  <p class="form-section-hint">
+    Set a password to grant this worker access to their personal portal. Leave blank to disable portal access.
+  </p>
+
+  <div class="form-field">
+    <label for="{{ form.worker_password.id_for_label }}">{{ form.worker_password.label }}</label>
+    {{ form.worker_password }}
+    <small class="form-hint">Workers use their nickname + this password to login at /worker/login/</small>
+    {% if form.worker_password.errors %}<small class="form-error">{{ form.worker_password.errors|join:" " }}</small>{% endif %}
+    {% if obj.worker_password %}
+      <div class="password-warning">
+        <span>Current password is set. Update the field above to change it, or leave empty to keep current password.</span>
+      </div>
+    {% endif %}
   </div>
 
   <h3 class="form-section-title">👁 Public info</h3>

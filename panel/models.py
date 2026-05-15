@@ -47,6 +47,15 @@ class Trabajadora(models.Model):
         default=Decimal("0.00"),
         help_text="Percentage the salon retains from each service.",
     )
+    
+    # ── Worker Portal Login ───────────────────────────────────────────
+    worker_password = models.CharField(
+        "worker portal password",
+        max_length=100,
+        blank=True,
+        default="",
+        help_text="Password for worker login. Leave blank to disable portal access.",
+    )
 
     # ── Public fields (visible to clients) ────────────────────────────
     nickname = models.SlugField(
@@ -107,6 +116,9 @@ class Trabajadora(models.Model):
                 n += 1
             self.nickname = candidate
         super().save(*args, **kwargs)
+
+
+
 
 
 class Registro(models.Model):

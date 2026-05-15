@@ -15,29 +15,38 @@ class TrabajadoraForm(forms.ModelForm):
         model = Trabajadora
         fields = [
             "nombre_completo",
-            "nickname",
             "correo",
             "telefono",
             "porcentaje",
+            "worker_password",  # ← AGREGADO
+            "nickname",
             "bio",
             "foto",
             "activa",
         ]
         widgets = {
             "nombre_completo": forms.TextInput(
-                attrs={**_TXT, "placeholder": "e.g. Andrea Martinez (private)"}
-            ),
-            "nickname": forms.TextInput(
-                attrs={**_TXT, "placeholder": "auto-generated if empty"}
+                attrs={**_TXT, "placeholder": "e.g. Emily Smith (private)"}
             ),
             "correo": forms.EmailInput(
-                attrs={**_TXT, "placeholder": "andrea@example.com"}
+                attrs={**_TXT, "placeholder": "emily@example.com"}
             ),
             "telefono": forms.TextInput(
                 attrs={**_TXT, "placeholder": "+1 (555) 123-4567"}
             ),
             "porcentaje": forms.NumberInput(
                 attrs={**_NUM, "max": "100"}
+            ),
+            "worker_password": forms.PasswordInput(  # ← AGREGADO
+                attrs={
+                    **_TXT,
+                    "placeholder": "Password for worker portal",
+                    "autocomplete": "new-password"
+                },
+                render_value=True  # Muestra el valor en edición
+            ),
+            "nickname": forms.TextInput(
+                attrs={**_TXT, "placeholder": "auto-generated if empty"}
             ),
             "bio": forms.Textarea(
                 attrs={**_TXT, "rows": 3,
@@ -49,10 +58,11 @@ class TrabajadoraForm(forms.ModelForm):
         }
         labels = {
             "nombre_completo": "Full name (private)",
-            "nickname": "Public nickname",
             "correo": "Email (private)",
             "telefono": "Phone (private)",
             "porcentaje": "Salon commission (%)",
+            "worker_password": "Worker portal password",  # ← AGREGADO
+            "nickname": "Public nickname",
             "bio": "Public bio",
             "foto": "Photo / avatar",
             "activa": "Active",

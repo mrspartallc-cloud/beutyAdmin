@@ -1570,3 +1570,196 @@ def workers_calendar(request):
             "n_total": citas_qs.count(),
         },
     )
+
+
+
+
+# ═════════════════════════════════════════════════════════════════════════
+# 👷 WORKER PORTAL — Personal dashboard with login (nickname + password)
+# ═════════════════════════════════════════════════════════════════════════
+
+def worker_login(request):
+    """Login page for workers using nickname + worker_password."""
+    if request.method == "POST":
+        nickname = request.POST.get("nickname", "").strip().lower()
+        password = request.POST.get("password", "").strip()
+        
+        try:
+            # Find worker by nickname
+            worker = Trabajadora.objects.get(nickname=nickname, activa=True)
+            
+            # Verify password
+            if worker.worker_password and worker.worker_password == password:
+                # Login successful - store worker ID in session
+                request.session['worker_id'] = worker.pk
+                request.session['worker_nickname'] = worker.nickname
+                messages.success(request, f"Welcome, @{worker.nickname}!")
+                return redirect('worker_dashboard')
+            else:
+                messages.error(request, "Invalid credentials. Please check your password.")
+        except Trabajadora.DoesNotExist:
+            messages.error(request, "Invalid credentials. Please check your nickname.")
+    
+    return render(request, 'panel/worker_login.html')
+
+
+def worker_logout(request):
+    """Logout worker."""
+    if 'worker_id' in request.session:
+        del request.session['worker_id']
+        del request.session['worker_nickname']
+    messages.info(request, "You have been logged out.")
+    return redirect('worker_login')
+
+
+def worker_required(view_func):
+    """Decorator to protect worker views."""
+    def wrapper(request, *args, **kwargs):
+        if 'worker_id' not in request.session:
+            messages.warning(request, "Please log in to continue.")
+            return redirect('worker_login')
+        try:
+            worker = Trabajadora.objects.get(pk=request.session['worker_id'], activa=True)
+            request.worker = worker
+            return view_func(request, *args, **kwargs)
+        except Trabajadora.DoesNotExist:
+            del request.session['worker_id']
+            messages.error(request, "Your account is no longer active.")
+            return redirect('worker_login')
+    return wrapper
+
+@worker_required
+def worker_dashboard(request):
+    """Personal dashboard showing appointments AND income for this worker."""
+    worker = request.worker
+    
+    # ── Appointments (weekly) ────────────────────────────────────────
+    try:
+        offset = int(request.GET.get("w", "0"))
+    except ValueError:
+        offset = 0
+    
+    hoy = date.today()
+    inicio_semana = hoy - timedelta(days=hoy.weekday()) + timedelta(weeks=offset)
+    dias = [inicio_semana + timedelta(days=i) for i in range(7)]
+    
+    citas_qs = (
+        Cita.objects.filter(
+            trabajadora=worker,
+            fecha__gte=dias[0],
+            fecha__lte=dias[-1]
+        )
+        .exclude(estado=Cita.ESTADO_CANCELADA)
+        .select_related("servicio")
+        .order_by("fecha", "hora")
+    )
+    
+    # Build grid by day
+    grid = {}
+    ahora = datetime.now()
+    for d in dias:
+        grid[d] = []
+    
+    for c in citas_qs:
+        # Check if appointment is in the past
+        cita_datetime = datetime.combine(c.fecha, c.hora)
+        c.es_pasada = cita_datetime < ahora
+        grid[c.fecha].append(c)
+    
+    # Count by status
+    pendientes = citas_qs.filter(estado=Cita.ESTADO_PENDIENTE).count()
+    confirmadas = citas_qs.filter(estado=Cita.ESTADO_CONFIRMADA).count()
+    completadas = citas_qs.filter(estado=Cita.ESTADO_COMPLETADA).count()
+    
+    # ── Income Summary (filterable by date) ──────────────────────────
+    fecha_inicio_str = request.GET.get('fecha_inicio')
+    fecha_fin_str = request.GET.get('fecha_fin')
+    
+    if fecha_fin_str:
+        try:
+            fecha_fin = datetime.strptime(fecha_fin_str, '%Y-%m-%d').date()
+        except ValueError:
+            fecha_fin = date.today()
+    else:
+        fecha_fin = date.today()
+    
+    if fecha_inicio_str:
+        try:
+            fecha_inicio = datetime.strptime(fecha_inicio_str, '%Y-%m-%d').date()
+        except ValueError:
+            fecha_inicio = fecha_fin - timedelta(days=30)
+    else:
+        fecha_inicio = fecha_fin - timedelta(days=30)
+    
+    # Filter registros by selected date range
+    registros = (
+        Registro.objects.filter(
+            trabajadora=worker,
+            fecha__gte=fecha_inicio,
+            fecha__lte=fecha_fin
+        )
+        .order_by("-fecha")
+    )
+    
+    # Calculate totals for the filtered period
+    agg = registros.aggregate(
+        total_servicios=Sum("monto"),
+        total_propinas=Sum("propina"),
+        total_ganado=Sum("total"),
+        num_registros=Count("pk"),
+    )
+    
+    total_servicios = agg["total_servicios"] or Decimal("0")
+    total_propinas = agg["total_propinas"] or Decimal("0")
+    total_ganado = agg["total_ganado"] or Decimal("0")
+    num_registros = agg["num_registros"]
+    
+    return render(
+        request, 'panel/worker_dashboard.html',
+        {
+            # Appointments
+            "worker": worker,
+            "dias": dias,
+            "grid": grid,
+            "offset": offset,
+            "anterior": offset - 1,
+            "siguiente": offset + 1,
+            "es_actual": offset == 0,
+            "n_total": citas_qs.count(),
+            "pendientes": pendientes,
+            "confirmadas": confirmadas,
+            "completadas": completadas,
+            
+            # Income - TOTALS UPDATE WITH FILTER
+            "registros": registros,
+            "total_servicios": total_servicios,
+            "total_propinas": total_propinas,
+            "total_ganado": total_ganado,
+            "num_registros": num_registros,
+            "fecha_inicio": fecha_inicio,
+            "fecha_fin": fecha_fin,
+        },
+    )
+
+@worker_required
+@require_POST
+def worker_complete_appointment(request, pk):
+    """Mark appointment as completed (only if it belongs to this worker)."""
+    worker = request.worker
+    cita = get_object_or_404(Cita, pk=pk, trabajadora=worker)
+    
+    # Check if appointment is in the past
+    ahora = datetime.now()
+    cita_datetime = datetime.combine(cita.fecha, cita.hora)
+    
+    if cita_datetime < ahora:
+        messages.error(request, "Cannot complete past appointments. This appointment has already passed.")
+        return redirect('worker_dashboard')
+    
+    if cita.estado != Cita.ESTADO_COMPLETADA:
+        cita.estado = Cita.ESTADO_COMPLETADA
+        # Bypass validation for past dates by using update_fields
+        cita.save(update_fields=["estado", "actualizado"])
+        messages.success(request, f"✓ Completed: {cita.nombre_cliente}")
+    
+    return redirect('worker_dashboard')

@@ -1,0 +1,780 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#FFFAF7">
+  <title>My Earnings · @{{ worker.nickname }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <style>
+    :root {
+      --bg: #FFFAF7;
+      --white: #FFFFFF;
+      --gold: #C9A96E;
+      --gold-dark: #A8884B;
+      --text: #2D2424;
+      --text-muted: #8B7355;
+      --border: rgba(201, 169, 110, 0.2);
+      --pendiente: #F59E0B;
+      --confirmada: #10B981;
+      --completada: #6366F1;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: env(safe-area-inset-top) 16px calc(16px + env(safe-area-inset-bottom));
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      position: sticky;
+      top: 0;
+      background: rgba(255, 250, 247, 0.95);
+      backdrop-filter: blur(20px);
+      margin: 0 -16px 20px;
+      padding: 16px 16px 12px;
+      border-bottom: 1.5px solid var(--border);
+      z-index: 100;
+    }
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--gold);
+    }
+    .avatar-placeholder {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+      color: white;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .user-name {
+      font-weight: 700;
+      color: var(--text);
+      font-size: 1.1rem;
+    }
+    .user-name small {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .logout-btn {
+      padding: 8px 16px;
+      background: rgba(201, 169, 110, 0.1);
+      color: var(--gold-dark);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .logout-btn:active { background: rgba(201, 169, 110, 0.2); }
+
+    /* Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: white;
+      border-radius: 10px;
+      padding: 14px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(168, 136, 75, 0.06);
+      border: 1px solid var(--border);
+    }
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+    .stat-pendiente .stat-value { color: var(--pendiente); }
+    .stat-confirmada .stat-value { color: var(--confirmada); }
+    .stat-completada .stat-value { color: var(--completada); }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      background: white;
+      padding: 6px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(168, 136, 75, 0.06);
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+      color: white;
+    }
+
+    /* Tab Content */
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Navigation */
+    .nav {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .nav a {
+      padding: 10px 20px;
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .nav a:active { background: rgba(201, 169, 110, 0.1); }
+
+    /* Calendar Grid */
+    .calendar {
+      display: grid;
+      gap: 16px;
+    }
+    .day-card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 10px rgba(168, 136, 75, 0.08);
+      border: 1px solid var(--border);
+    }
+    .day-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1.5px solid rgba(201, 169, 110, 0.1);
+    }
+    .day-name {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text);
+    }
+    .day-date {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .day-header.is-today {
+      border-bottom-color: var(--gold);
+    }
+    .day-header.is-today .day-name {
+      color: var(--gold);
+    }
+
+    /* Appointments */
+    .appt {
+      background: linear-gradient(135deg, #FFFBF7, white);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+      border-left: 4px solid;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .appt:last-child { margin-bottom: 0; }
+    .appt-pendiente { border-left-color: var(--pendiente); background: #FFFBEB; }
+    .appt-confirmada { border-left-color: var(--confirmada); background: #ECFDF5; }
+    .appt-completada { border-left-color: var(--completada); background: #EEF2FF; opacity: 0.75; }
+    .appt-pasada { 
+      border-left-color: #9CA3AF; 
+      background: #F3F4F6; 
+      opacity: 0.6;
+    }
+    
+    .appt-info { flex: 1; }
+    .appt-time {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .appt-client {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+    .appt-service {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .appt-phone {
+      font-size: 0.8rem;
+      color: var(--gold-dark);
+      font-weight: 500;
+    }
+    .appt-notes {
+      font-size: 0.85rem;
+      color: #6B5B53;
+      font-style: italic;
+      background: rgba(201, 169, 110, 0.08);
+      padding: 8px 10px;
+      border-radius: 6px;
+      margin-top: 8px;
+      border-left: 3px solid var(--gold);
+    }
+    .appt-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    /* Complete Button */
+    .complete-form {
+      flex-shrink: 0;
+    }
+    .complete-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+      color: white;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: transform 0.2s;
+      box-shadow: 0 2px 8px rgba(168, 136, 75, 0.3);
+    }
+    .complete-btn:active { transform: scale(0.9); }
+    .complete-btn:disabled {
+      background: #E5E5E5;
+      color: #999;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* Income Section */
+    .income-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .date-range {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Filter Row */
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 16px;
+      background: linear-gradient(135deg, #FFFBF7 0%, #FFF8F0 100%);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+    }
+    .filter-label {
+      font-weight: 700;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .date-input {
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+    .date-input:focus {
+      border-color: var(--gold);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.1);
+    }
+    .btn-filter {
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-filter:active { transform: scale(0.95); }
+    .btn-reset {
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: white;
+      color: var(--text-muted);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-reset:active { background: rgba(201, 169, 110, 0.1); }
+
+
+    .income-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .income-stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 18px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(168, 136, 75, 0.08);
+      border: 1px solid var(--border);
+    }
+    .income-stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+      color: var(--gold-dark);
+      margin-bottom: 6px;
+    }
+    .income-stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    /* Table - Premium Admin Style */
+    .table-card {
+      background: white;
+      border-radius: 12px;
+      padding: 0;
+      box-shadow: 0 2px 10px rgba(168, 136, 75, 0.08);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .table-scroll {
+      overflow-x: auto;
+      padding: 0 20px 20px;
+    }
+    table.dataTable {
+      width: 100% !important;
+      border-collapse: collapse !important;
+      margin-top: 0 !important;
+    }
+    table.dataTable thead th {
+      background: linear-gradient(135deg, #FFF8F0, #FFF5E8) !important;
+      color: var(--text) !important;
+      font-weight: 700 !important;
+      padding: 14px 16px !important;
+      text-align: left !important;
+      font-size: 0.8rem !important;
+      text-transform: uppercase !important;
+      letter-spacing: 1px !important;
+      border-bottom: 2px solid var(--border) !important;
+    }
+    table.dataTable thead th.num {
+      text-align: right !important;
+    }
+    table.dataTable tbody td {
+      padding: 12px 16px !important;
+      border-bottom: 1px solid rgba(201, 169, 110, 0.1) !important;
+      font-size: 0.9rem !important;
+      color: var(--text) !important;
+    }
+    table.dataTable tbody td.num {
+      text-align: right !important;
+      font-variant-numeric: tabular-nums !important;
+    }
+    table.dataTable tbody td.strong {
+      font-weight: 700 !important;
+    }
+    table.dataTable tbody tr:hover {
+      background: linear-gradient(90deg, rgba(201, 169, 110, 0.04), transparent) !important;
+    }
+
+    /* DataTable Controls */
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_paginate {
+      margin: 12px 20px !important;
+      font-size: 0.85rem !important;
+      color: var(--text-muted) !important;
+    }
+    .dataTables_wrapper .dataTables_filter input {
+      padding: 6px 12px !important;
+      border: 1.5px solid var(--border) !important;
+      border-radius: 8px !important;
+      margin-left: 8px !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+      padding: 4px 10px !important;
+      margin: 0 2px !important;
+      border-radius: 6px !important;
+      border: 1px solid var(--border) !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+      background: var(--gold) !important;
+      color: white !important;
+      border-color: var(--gold) !important;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state::before {
+      content: "📅";
+      display: block;
+      font-size: 3rem;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    /* Messages */
+    .messages {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      width: calc(100% - 32px);
+      max-width: 400px;
+    }
+    .alert {
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .alert-success { background: #D1FAE5; color: #065F46; border-left: 3px solid #10B981; }
+    .alert-warning { background: #FEF3C7; color: #92400E; border-left: 3px solid #F59E0B; }
+    .alert-error { background: #FEE2E2; color: #991B1B; border-left: 3px solid #DC2626; }
+
+
+
+    @media (max-width: 640px) {
+      .stats, .income-stats { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .stat-card, .income-stat-card { padding: 10px 8px; }
+      .stat-value, .income-stat-value { font-size: 1.4rem; }
+      .stat-label, .income-stat-label { font-size: 0.65rem; }
+      .income-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .filter-row { flex-direction: column; align-items: stretch; }
+      .date-input, .btn-filter, .btn-reset { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  {% if messages %}
+    <div class="messages no-print">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <header class="header no-print">
+    <div class="header-top">
+      <div class="user-info">
+        {% if worker.foto %}
+          <img src="{{ worker.foto.url }}" alt="{{ worker.nickname }}" class="avatar">
+        {% else %}
+          <div class="avatar-placeholder">{{ worker.nickname|first|upper }}</div>
+        {% endif %}
+        <div class="user-name">
+          @{{ worker.nickname }}
+          <small>Worker Portal</small>
+        </div>
+      </div>
+      <a href="{% url 'worker_logout' %}" class="logout-btn">Sign Out</a>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card stat-pendiente">
+        <div class="stat-value">{{ pendientes }}</div>
+        <div class="stat-label">Pending</div>
+      </div>
+      <div class="stat-card stat-confirmada">
+        <div class="stat-value">{{ confirmadas }}</div>
+        <div class="stat-label">Confirmed</div>
+      </div>
+      <div class="stat-card stat-completada">
+        <div class="stat-value">{{ completadas }}</div>
+        <div class="stat-label">Completed</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Tabs -->
+  <div class="tabs no-print">
+    <button class="tab-btn active" onclick="showTab('schedule')">📅 Schedule</button>
+    <button class="tab-btn" onclick="showTab('income')">💰 My Earnings</button>
+  </div>
+
+  <!-- Schedule Tab -->
+  <div id="schedule" class="tab-content active">
+    <nav class="nav no-print">
+      <a href="?w={{ anterior }}#schedule">‹ Previous</a>
+      {% if not es_actual %}
+        <a href="{% url 'worker_dashboard' %}#schedule">This Week</a>
+      {% endif %}
+      <a href="?w={{ siguiente }}#schedule">Next ›</a>
+    </nav>
+
+    {% if n_total > 0 %}
+      <div class="calendar">
+        {% now "Y-m-d" as today_iso %}
+        {% for d, citas in grid.items %}
+          {% if citas %}
+            <div class="day-card">
+              <div class="day-header {% if d|date:'Y-m-d' == today_iso %}is-today{% endif %}">
+                <div class="day-name">{{ d|date:"l" }}</div>
+                <div class="day-date">{{ d|date:"M j, Y" }}</div>
+              </div>
+              
+              {% for c in citas %}
+                <div class="appt {% if c.es_pasada %}appt-pasada{% else %}appt-{{ c.estado }}{% endif %}">
+                  <div class="appt-info">
+                    <div class="appt-time">{{ c.hora|time:"g:i A" }}</div>
+                    <div class="appt-client">{{ c.nombre_cliente }}</div>
+                    <div class="appt-service">{{ c.servicio.nombre }} · {{ c.duracion_minutos }} min</div>
+                    {% if c.telefono %}
+                      <div class="appt-phone">📞 {{ c.telefono }}</div>
+                    {% endif %}
+                    {% if c.notas %}
+                      <div class="appt-notes">📝 {{ c.notas }}</div>
+                    {% endif %}
+                    <div class="appt-status">
+                      {{ c.get_estado_display }}
+                      {% if c.es_pasada %} · Past{% endif %}
+                    </div>
+                  </div>
+                  
+                  {% if c.estado != 'completada' and not c.es_pasada %}
+                    <form method="post" action="{% url 'worker_complete_appointment' c.pk %}" class="complete-form no-print">
+                      {% csrf_token %}
+                      <button type="submit" class="complete-btn" title="Mark as completed">✓</button>
+                    </form>
+                  {% else %}
+                    <div class="complete-form no-print">
+                      <button class="complete-btn" disabled title="{% if c.es_pasada %}Past appointment{% else %}Already completed{% endif %}">✓</button>
+                    </div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <p>No appointments scheduled this week.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Income Tab -->
+  <div id="income" class="tab-content">
+    <div class="income-header">
+      <div>
+        <div class="section-title">My Earnings</div>
+        <div class="date-range">
+          {% if num_registros > 0 %}
+            {{ fecha_inicio|date:"M j" }} - {{ fecha_fin|date:"M j, Y" }} ({{ num_registros }} service{{ num_registros|pluralize }})
+          {% else %}
+            {{ fecha_inicio|date:"M j" }} - {{ fecha_fin|date:"M j, Y" }}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <form method="get" action="{% url 'worker_dashboard' %}" class="filter-row no-print">
+      <span class="filter-label">Period:</span>
+      <input type="date" name="fecha_inicio" value="{{ fecha_inicio|date:'Y-m-d' }}" class="date-input" required>
+      <input type="date" name="fecha_fin" value="{{ fecha_fin|date:'Y-m-d' }}" class="date-input" required>
+      <input type="hidden" name="tab" value="income">
+      <button type="submit" class="btn-filter">Apply</button>
+      <a href="{% url 'worker_dashboard' %}#income" class="btn-reset">Reset</a>
+    </form>
+
+    <div class="income-stats">
+      <div class="income-stat-card">
+        <div class="income-stat-value">${{ total_ganado|floatformat:2 }}</div>
+        <div class="income-stat-label">Total Earned</div>
+      </div>
+      <div class="income-stat-card">
+        <div class="income-stat-value">${{ total_servicios|floatformat:2 }}</div>
+        <div class="income-stat-label">Services</div>
+      </div>
+      <div class="income-stat-card">
+        <div class="income-stat-value">${{ total_propinas|floatformat:2 }}</div>
+        <div class="income-stat-label">Tips</div>
+      </div>
+    </div>
+
+    {% if num_registros > 0 %}
+      <!-- Table -->
+      <div class="table-card">
+        <div class="table-scroll">
+          <table id="incomeTable" class="display">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th class="num">Service $</th>
+                <th class="num">Tips $</th>
+                <th class="num">Total $</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in registros %}
+                <tr>
+                  <td class="strong">{{ r.fecha|date:"m/d/Y" }}</td>
+                  <td class="num">${{ r.monto|floatformat:2 }}</td>
+                  <td class="num">${{ r.propina|floatformat:2 }}</td>
+                  <td class="num strong">${{ r.total|floatformat:2 }}</td>
+                  <td>{{ r.notas|truncatechars:50 }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <p>No income recorded in the selected period.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  
+  <script>
+    // Tab switching
+    function showTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(tabName).classList.add('active');
+      event.target.classList.add('active');
+      window.location.hash = tabName;
+    }
+
+    // Restore tab from hash or URL param
+    window.addEventListener('load', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tabParam = urlParams.get('tab');
+      const hash = window.location.hash.slice(1);
+      
+      if (tabParam === 'income' || hash === 'income') {
+        document.querySelector('.tab-btn:nth-child(2)').click();
+      }
+    });
+
+    // Auto-hide messages
+    setTimeout(() => {
+      const msgs = document.querySelector('.messages');
+      if (msgs) msgs.style.display = 'none';
+    }, 4000);
+
+    // DataTable
+    {% if num_registros > 0 %}
+    $(document).ready(function() {
+      $('#incomeTable').DataTable({
+        order: [[0, 'desc']],
+        pageLength: 10,
+        language: {
+          search: "Search:",
+          lengthMenu: "Show _MENU_ entries",
+          info: "Showing _START_ to _END_ of _TOTAL_",
+          paginate: { first: "First", last: "Last", next: "Next", previous: "Previous" }
+        }
+      });
+    });
+    {% endif %}
+  </script>
+
+</body>
+</html>

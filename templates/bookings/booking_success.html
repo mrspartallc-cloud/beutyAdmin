@@ -397,9 +397,16 @@
           <dd>{{ cita.fecha|date:"l, F j, Y" }} · {{ cita.hora|time:"H:i" }}</dd>
         </div>
         <div>
-          <dt>Status</dt>
-          <dd><span class="pill pill-gold">{{ cita.get_estado_display }}</span></dd>
+            <dt>Status</dt>
+            <dd><span class="pill pill-green">Appointment created successfully.</span></dd>
         </div>
+{% comment %}
+          <div>
+            <dt>Status</dt>
+            <dd><span class="pill pill-gold">{{ cita.get_estado_display }}</span></dd>
+          </div>
+{% endcomment %}
+  
       </dl>
 
       <div class="success-actions">

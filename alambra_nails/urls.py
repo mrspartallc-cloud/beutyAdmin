@@ -5,14 +5,29 @@ from django.urls import include, path
 from django.views.generic import TemplateView
 
 from core.views import home
-from panel.views import workers_calendar  # ← Agregar import
+from panel.views import (
+    workers_calendar,  # Public read-only
+    worker_login,      # ← Worker login
+    worker_logout,     # ← Worker logout
+    worker_dashboard,  # ← Worker personal dashboard
+    worker_complete_appointment,  # ← Complete action
+)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", home, name="home"),
     path("reservar/", include(("bookings.urls", "bookings"), namespace="bookings")),
     path("panel/", include("panel.urls")),
-    path("workers/", workers_calendar, name="workers_calendar"),  # ← Nueva ruta
+    
+    # Public workers calendar (no login)
+    path("workers/", workers_calendar, name="workers_calendar"),
+    
+    # Worker portal (with login)
+    path("worker/login/", worker_login, name="worker_login"),
+    path("worker/logout/", worker_logout, name="worker_logout"),
+    path("worker/", worker_dashboard, name="worker_dashboard"),
+    path("worker/complete/<int:pk>/", worker_complete_appointment, name="worker_complete_appointment"),
+    
     path(
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
